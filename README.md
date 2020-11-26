@@ -6,3 +6,4 @@
   - **stat**: use it to view game statistics
   - **draw**: use it to draw table to console
   - **quit**: use it to quit game
+ * Simply, run ChessPlaying.exe and enjoy!
