@@ -1,0 +1,16 @@
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\ChessPlaying.exe
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\ChessPlaying.deps.json
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\ChessPlaying.runtimeconfig.json
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\ChessPlaying.runtimeconfig.dev.json
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\ChessPlaying.dll
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\ChessPlaying.pdb
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\Thrones.Gaming.Chess.dll
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\Thrones.Gaming.Chess.pdb
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.csprojAssemblyReference.cache
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.AssemblyInfoInputs.cache
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.AssemblyInfo.cs
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.csproj.CoreCompileInputs.cache
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.csproj.CopyComplete
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.dll
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.pdb
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.genruntimeconfig.cache
