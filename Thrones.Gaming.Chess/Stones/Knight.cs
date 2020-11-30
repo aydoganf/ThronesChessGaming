@@ -11,9 +11,9 @@ namespace Thrones.Gaming.Chess.Stones
         {
         }
 
-        public override bool Move(Location target, Table table, out IStone eated)
+        public override bool TryMove(Location target, Table table, out IStone willEated)
         {
-            eated = default;
+            willEated = default;
             if (CheckMove(target) == false)
             {
                 return false;
@@ -22,10 +22,8 @@ namespace Thrones.Gaming.Chess.Stones
             var targetLocationStone = table.Stones.FirstOrDefault(s => s.Location == target);
             if (targetLocationStone != null)
             {
-                eated = targetLocationStone;
+                willEated = targetLocationStone;
             }
-
-            base.Move(target);
             return true;
         }
 

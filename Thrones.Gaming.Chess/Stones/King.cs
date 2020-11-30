@@ -11,10 +11,10 @@ namespace Thrones.Gaming.Chess.Stones
         {
         }
 
-        public override bool Move(Location target, Table table, out IStone eated)
+        public override bool TryMove(Location target, Table table, out IStone willEated)
         {
-            eated = default;
-            throw new NotImplementedException();
+            willEated = null;
+            return false;
         }
 
         protected override bool CheckMove(Location target)

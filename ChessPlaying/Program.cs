@@ -4,18 +4,14 @@ using Thrones.Gaming.Chess.SessionManagement;
 
 namespace ChessPlaying
 {
-    class Program
+    class Program 
     {
         static void Main(string[] args)
         {
-
-            var session = Session
-                .CreateNewSession("test session")
-                .AddPlayer("faruk")
-                .AddPlayer("ali");
-
-
-            session.Start();
+            SessionFactory
+                .CreateOne("test session", null, SessionType.Console)
+                .AddPlayers("faruk", "ali")
+                .Start();
         }
     }
 }

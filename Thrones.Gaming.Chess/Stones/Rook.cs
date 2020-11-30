@@ -15,9 +15,9 @@ namespace Thrones.Gaming.Chess.Stones
         {
         }
 
-        public override bool Move(Location target, Table table, out IStone eated)
+        public override bool TryMove(Location target, Table table, out IStone willEated)
         {
-            eated = default;
+            willEated = default;
             if (CheckMove(target) == false)
             {
                 return false;
@@ -28,53 +28,10 @@ namespace Thrones.Gaming.Chess.Stones
                 return false;
             }
 
-            eated = table.Stones.FirstOrDefault(s => s.Location == target);
-            //var span = target - Location;
-
-            //int currentX = Location.X;
-            //int currentY = Location.Y;
-            //int targetLocationBorder = span.YDiff == 0 ? span.XDiff : span.YDiff;
-
-            //for (int i = 1; i <= targetLocationBorder; i++)
-            //{
-            //    int checkX = currentX;
-            //    int checkY = currentY;
-
-            //    if (span.YDiff == 0)
-            //    {
-            //        checkX += 1;
-            //    }
-
-            //    if (span.XDiff == 0)
-            //    {
-            //        checkY += 1;
-            //    }
-
-            //    var checkLocation = table.Locations.FirstOrDefault(l => l.X == checkX && l.Y == checkY);
-            //    if (checkLocation == null)
-            //    {
-            //        return false;
-            //    }
-
-            //    var nextLocationStone = table.Stones.FirstOrDefault(s => s.Location == checkLocation);
-            //    if (nextLocationStone != null)
-            //    {
-            //        if (i != targetLocationBorder)
-            //        {
-            //            return false;
-            //        }
-            //        else
-            //        {
-            //            // son lokasyon ve düşman taşı var, ye oni
-            //            eated = nextLocationStone;
-            //        }
-            //    }
-            //}
-
-            base.Move(target);
+            willEated = table.Stones.GetFromLocation(target);
             return true;
         }
-
+                
         protected override bool CheckMove(Location target)
         {
             // gidilecek location'da kendi taşı varsa

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Thrones.Gaming.Chess.Coordinate;
+using Thrones.Gaming.Chess.Movement;
 using Thrones.Gaming.Chess.Players;
 using Thrones.Gaming.Chess.SessionManagement;
 
@@ -12,9 +13,9 @@ namespace Thrones.Gaming.Chess.Stones
         {
         }
 
-        public override bool Move(Location target, Table table, out IStone eated)
+        public override bool TryMove(Location target, Table table, out IStone willEated)
         {
-            eated = default;
+            willEated = default;
             if (CheckMove(target) == false)
             {
                 return false;
@@ -27,8 +28,24 @@ namespace Thrones.Gaming.Chess.Stones
 
             for (int i = 1; i <= span.XDiff; i++)
             {
-                currentX += 1;
-                currentY += 1;
+
+                if (span.XMovement == MovementDirection.Forward)
+                {
+                    currentX += 1;
+                }
+                else
+                {
+                    currentX -= 1;
+                }
+
+                if (span.YMovement == MovementDirection.Forward)
+                {
+                    currentY += 1;
+                }
+                else
+                {
+                    currentY -= 1;
+                }
 
                 var checkLocation = table.Locations.FirstOrDefault(l => l.X == currentX && l.Y == currentY);
                 if (checkLocation == null)
@@ -36,7 +53,7 @@ namespace Thrones.Gaming.Chess.Stones
                     return false;
                 }
 
-                var checkLocationStone = table.Stones.FirstOrDefault(s => s.Location == checkLocation);
+                var checkLocationStone = table.Stones.GetFromLocation(checkLocation);
                 if (checkLocationStone != null)
                 {
                     if (i != span.XDiff)
@@ -46,12 +63,17 @@ namespace Thrones.Gaming.Chess.Stones
                     }
                     else
                     {
-                        eated = checkLocationStone;
+                        willEated = checkLocationStone;
+                        break;
                     }
                 }
             }
 
-            base.Move(target);
+            if (willEated == this)
+            {
+                willEated = null;
+            }
+
             return true;
         }
 

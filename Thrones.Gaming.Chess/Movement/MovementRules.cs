@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Thrones.Gaming.Chess.Coordinate;
 using Thrones.Gaming.Chess.SessionManagement;
+using Thrones.Gaming.Chess.Stones;
 
 namespace Thrones.Gaming.Chess.Movement
 {
@@ -44,7 +45,7 @@ namespace Thrones.Gaming.Chess.Movement
                     return false;
                 }
 
-                var checkLocationStone = table.Stones.FirstOrDefault(s => s.Location == checkLocation);
+                var checkLocationStone = table.Stones.GetFromLocation(checkLocation);
                 if (checkLocationStone != null)
                 {
                     if (i != span.XDiff)
@@ -63,7 +64,7 @@ namespace Thrones.Gaming.Chess.Movement
             var span = to - from;
 
             int currentX = from.X;
-            int currentY = to.Y;
+            int currentY = from.Y;
             int targetLocationBorder = span.YDiff == 0 ? span.XDiff : span.YDiff;
 
             for (int i = 1; i <= targetLocationBorder; i++)
@@ -101,7 +102,7 @@ namespace Thrones.Gaming.Chess.Movement
                     return false;
                 }
 
-                var nextLocationStone = table.Stones.FirstOrDefault(s => s.Location == checkLocation);
+                var nextLocationStone = table.Stones.GetFromLocation(checkLocation);
                 if (nextLocationStone != null)
                 {
                     if (i != targetLocationBorder)

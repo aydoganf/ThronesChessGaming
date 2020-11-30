@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Thrones.Gaming.Chess.Movement;
+using Thrones.Gaming.Chess.SessionManagement;
 using Thrones.Gaming.Chess.Stones;
 
 namespace Thrones.Gaming.Chess.Players
@@ -9,22 +11,25 @@ namespace Thrones.Gaming.Chess.Players
     public class Player
     {
         public string Nickname { get; private set; }
-        public long Duration { get; private set; }
+        public long Duration { get; internal set; }
         public List<IStone> Stones { get; private set; }
         public List<IStone> Eats { get; private set; }
         public EnumStoneColor Color { get; private set; }
+        
+        private Table _table { get; set; }
 
         private Player()
         {
         }
 
-        public static Player CreateOne(string nickname, EnumStoneColor color)
+        public static Player CreateOne(string nickname, EnumStoneColor color, Table table)
         {
             var player = new Player();
             player.Nickname = nickname;
             player.Stones = new List<IStone>();
             player.Eats = new List<IStone>();
             player.Color = color;
+            player._table = table;
             return player;
         }
 
@@ -42,6 +47,23 @@ namespace Thrones.Gaming.Chess.Players
         {
             stone.Player.Stones.Remove(stone);
             Eats.Add(stone);
+        }
+
+        internal IStone GetStone(int x, int y)
+        {
+            return Stones.FirstOrDefault(s => s.Location == _table.GetLocation(x, y));
+        }
+
+        internal King GetKing()
+        {
+            if (Color == EnumStoneColor.Black)
+            {
+                // e8
+                return (King)Stones.FirstOrDefault(s => s.Location == _table.GetLocation(5, 8));
+            }
+
+            // e1
+            return (King)Stones.FirstOrDefault(s => s.Location == _table.GetLocation(5, 1));
         }
     }
 }

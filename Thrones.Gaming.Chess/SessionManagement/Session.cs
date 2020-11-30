@@ -1,256 +1,275 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Thrones.Gaming.Chess.Coordinate;
+using Thrones.Gaming.Chess.Movement;
 using Thrones.Gaming.Chess.Players;
+using Thrones.Gaming.Chess.Provider;
 using Thrones.Gaming.Chess.Stones;
 
 namespace Thrones.Gaming.Chess.SessionManagement
 {
-    public class Session
+    public abstract class Session : ISession
     {
-        public string Name { get; private set; }
-        public Table Table { get; private set; }
-        public List<Player> Players { get; private set; }
+        public string Name { get; protected set; }
+        public Table Table { get; protected set; }
+        public List<Player> Players { get; protected set; }
+        public Player CurrentPlayer { get; protected set; }
+        public Player NextPlayer { get; protected set; }
+        public Player PreviousPlayer => NextPlayer;
+        private int CurrentIndexer = 0;
 
-        public Player CurrentPlayer { get; private set; }
-        private int CurrentIndexer = 0; 
+        private IGameProvider _gameProvider;
+        public bool Check { get; protected set; }
+        public IStone CheckStone { get; set; }
 
-        private Session()
+        private Stopwatch SessionTimer { get; set; }
+        protected Dictionary<MovementInstraction, MovementResult> MovementInstractions { get; set; } = new Dictionary<MovementInstraction, MovementResult>();
+
+        protected Session(string name, IGameProvider gameProvider) 
         {
+            Name = name;
+            Table = Table.CreateOne();
+            Players = new List<Player>();
+            _gameProvider = gameProvider;
         }
 
-        public static Session CreateNewSession(string name)
+        public ISession AddPlayers(string blackPlayerNickname, string whitePlayerNickname)
         {
-            var session = new Session();
-            session.Name = name;
-            session.Table = Table.CreateOne();
-            session.Players = new List<Player>();
-            return session;
-        }
+            string[] players = new string[2] { blackPlayerNickname, whitePlayerNickname };
 
-
-        public Session AddPlayer(string nickname)
-        {
-            if (Players.Count == 2)
+            for (int i = 0; i < players.Length; i++)
             {
-                throw new InvalidOperationException("Session has already two players.");
+                var color = EnumStoneColor.Black;
+                if (i == 1)
+                {
+                    color = EnumStoneColor.White;
+                }
+                string nickname = players[i];
+                var player = Player.CreateOne(nickname, color, Table);
+
+                #region Pawns
+
+                int pawnLine = i == 0 ? 7 : 2;
+                List<IStone> stones = new List<IStone>();
+                foreach (var xAxis in Table.xAxis.Keys)
+                {
+                    var xAxisVal = Table.xAxis[xAxis];
+                    var name = $"pawn#{xAxisVal}{pawnLine}";
+                    var pawn = new Pawn(name, true, color, Table.GetLocation(xAxis, pawnLine), player);
+
+                    stones.Add(pawn);
+                }
+                #endregion
+
+                #region Rooks
+
+                Rook rookLeft = default;
+                Rook rookRight = default;
+
+                if (color == EnumStoneColor.Black)
+                {
+                    rookLeft = new Rook("rook#a8", false, color, Table.GetLocation(1, 8), player);
+                    rookRight = new Rook("rook#h8", false, color, Table.GetLocation(8, 8), player);
+                }
+                else
+                {
+                    rookLeft = new Rook("rook#a1", false, color, Table.GetLocation(1, 1), player);
+                    rookRight = new Rook("rook#h1", false, color, Table.GetLocation(8, 1), player);
+                }
+
+                stones.Add(rookLeft);
+                stones.Add(rookRight);
+
+                #endregion
+
+
+                #region Knights
+                Knight knightLeft = default;
+                Knight knightRight = default;
+
+                if (color == EnumStoneColor.Black)
+                {
+                    knightLeft = new Knight("knight#b8", true, color, Table.GetLocation(2, 8), player);
+                    knightRight = new Knight("knight#g8", true, color, Table.GetLocation(7, 8), player);
+                }
+                else
+                {
+                    knightLeft = new Knight("knight#b1", true, color, Table.GetLocation(2, 1), player);
+                    knightRight = new Knight("knight#g1", true, color, Table.GetLocation(7, 1), player);
+                }
+
+                stones.Add(knightLeft);
+                stones.Add(knightRight);
+                #endregion
+
+                #region Bishops
+                Bishop bishopLeft = default;
+                Bishop bishopRight = default;
+
+                if (color == EnumStoneColor.Black)
+                {
+                    bishopLeft = new Bishop("bishop#c8", false, color, Table.GetLocation(3, 8), player);
+                    bishopRight = new Bishop("bishop#f8", false, color, Table.GetLocation(6, 8), player);
+                }
+                else
+                {
+                    bishopLeft = new Bishop("bishop#c1", false, color, Table.GetLocation(3, 1), player);
+                    bishopRight = new Bishop("bishop#f1", false, color, Table.GetLocation(6, 1), player);
+                }
+
+                stones.Add(bishopLeft);
+                stones.Add(bishopRight);
+                #endregion
+
+                #region Queens
+                Queen queen = default;
+                if (color == EnumStoneColor.Black)
+                {
+                    queen = new Queen("queen", false, color, Table.GetLocation(4, 8), player);
+                }
+                else
+                {
+                    queen = new Queen("queen", false, color, Table.GetLocation(4, 1), player);
+                }
+
+                stones.Add(queen);
+                #endregion
+
+                #region Kings
+                King king = default;
+
+                if (color == EnumStoneColor.Black)
+                {
+                    king = new King("king", false, color, Table.GetLocation(5, 8), player);
+                }
+                else
+                {
+                    king = new King("king", false, color, Table.GetLocation(5, 1), player);
+                }
+
+                stones.Add(king);
+                #endregion
+
+
+                player.SetStones(stones);
+
+                Players.Add(player);
+                Table.AddStones(stones);
             }
-
-            var color = EnumStoneColor.Black;
-            var player = Player.CreateOne(nickname, color);
-
-            #region Pawns
-
-            int pawnLine = 7;
-
-            if (Players.Count == 1)
-            {
-                color = EnumStoneColor.White;
-                pawnLine = 2;
-            }
-
-            List<IStone> stones = new List<IStone>();
-            foreach (var xAxis in Table.xAxis.Keys)
-            {
-                var xAxisVal = Table.xAxis[xAxis];
-                var name = $"pawn#{xAxisVal}{pawnLine}";
-                var pawn = new Pawn(name, true, color, Table.GetLocation(xAxis, pawnLine), player);
-
-                stones.Add(pawn);
-            }
-            #endregion
-
-            #region Rooks
-
-            Rook rookLeft = default;
-            Rook rookRight = default;
-
-            if (color == EnumStoneColor.Black)
-            {
-                rookLeft = new Rook("rook#a8", false, color, Table.GetLocation(1, 8), player);
-                rookRight = new Rook("rook#h8", false, color, Table.GetLocation(8, 8), player);
-            }
-            else
-            {
-                rookLeft = new Rook("rook#a1", false, color, Table.GetLocation(1, 1), player);
-                rookRight = new Rook("rook#h1", false, color, Table.GetLocation(8, 1), player);
-            }
-
-            stones.Add(rookLeft);
-            stones.Add(rookRight);
-
-            #endregion
-
-            #region Knights
-            Knight knightLeft = default;
-            Knight knightRight = default;
-
-            if (color == EnumStoneColor.Black)
-            {
-                knightLeft = new Knight("knight#b8", true, color, Table.GetLocation(2, 8), player);
-                knightRight = new Knight("knight#g8", true, color, Table.GetLocation(7, 8), player);
-            }
-            else
-            {
-                knightLeft = new Knight("knight#b1", true, color, Table.GetLocation(2, 1), player);
-                knightRight = new Knight("knight#g1", true, color, Table.GetLocation(7, 1), player);
-            }
-
-            stones.Add(knightLeft);
-            stones.Add(knightRight);
-            #endregion
-
-            #region Bishops
-            Bishop bishopLeft = default;
-            Bishop bishopRight = default;
-
-            if (color == EnumStoneColor.Black)
-            {
-                bishopLeft = new Bishop("bishop#c8", false, color, Table.GetLocation(3, 8), player);
-                bishopRight = new Bishop("bishop#f8", false, color, Table.GetLocation(6, 8), player);
-            }
-            else
-            {
-                bishopLeft = new Bishop("bishop#c1", false, color, Table.GetLocation(3, 1), player);
-                bishopRight = new Bishop("bishop#f1", false, color, Table.GetLocation(6, 1), player);
-            }
-
-            stones.Add(bishopLeft);
-            stones.Add(bishopRight);
-            #endregion
-
-            #region Queens
-            Queen queen = default;
-            if (color == EnumStoneColor.Black)
-            {
-                queen = new Queen("queen", false, color, Table.GetLocation(4, 8), player);
-            }
-            else
-            {
-                queen = new Queen("queen", false, color, Table.GetLocation(4, 1), player);
-            }
-
-            stones.Add(queen);
-            #endregion
-
-            #region Kings
-            King king = default;
-
-            if (color == EnumStoneColor.Black)
-            {
-                king = new King("king", false, color, Table.GetLocation(5, 8), player);
-            }
-            else
-            {
-                king = new King("king", false, color, Table.GetLocation(5, 1), player);
-            }
-
-            stones.Add(king);
-            #endregion
-
-            
-            player.SetStones(stones);
-
-            Players.Add(player);
-            Table.AddStones(stones);
+           
             return this;
         }
 
 
+        public abstract void ShowInfo();
+        public abstract void DrawTable();
+        public abstract void WriteMessage(string message);
+        public abstract void WriteError(string error);
+        public abstract string WaitCommand();
+        public abstract void DrawStatistics();
+
         public void Start()
         {
             CurrentPlayer = Players[CurrentIndexer];
-            DrawToConsole();
+            NextPlayer = Players[CurrentIndexer == 0 ? 1 : 0];
+            DrawTable();
             string command = string.Empty;
+
+            SessionTimer = new Stopwatch();
+            SessionTimer.Start();
 
             while (command != "quit")
             {
                 if (string.IsNullOrEmpty(command))
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("You can use play, draw and quit commands.");
-                    Console.WriteLine("command: > play [from] [to] (ex: play a3 a5)");
+                    ShowInfo();
                 }
                 else
                 {
                     if (command == "draw")
                     {
-                        Console.Clear();
-                        DrawToConsole();
+                        DrawTable();
+                    }
+
+                    if (command == "undo")
+                    {
+                        if (MovementInstractions.Keys.Count != 0)
+                        {
+                            var lastInstraction = MovementInstractions.Keys.Last();
+                            var lastResult = MovementInstractions[lastInstraction];
+
+                            if (lastResult.Eated != null)
+                            {
+                                CurrentPlayer.Stones.Add(lastResult.Eated);                                
+                                PreviousPlayer.Eats.Remove(lastResult.Eated);
+                            }
+
+                            lastInstraction.MovingStone.ForceMove(lastInstraction.FromLocation);
+
+                            SetPlayerReturn();
+
+                            MovementInstractions.Remove(lastInstraction);
+                            DrawTable();
+                        }
                     }
 
                     if (command.StartsWith("play"))
                     {
-                        string[] commandArray = command.Split(" ");
-                        string from = commandArray[1];
-                        string to = commandArray[2];
-
-                        if (from.Length != 2)
+                        var commandDetail = CommandResolver.Resolve(command);
+                        if (commandDetail.IsCorrect == false)
                         {
-                            WriteError("from location parameter is wrong!");
+                            WriteError(commandDetail.ReturnMessage);
                             command = WaitCommand();
                             continue;
                         }
 
-                        if (to.Length != 2)
+                        var stone = CurrentPlayer.GetStone(commandDetail.From_X, commandDetail.From_Y);
+                        var targetLocation = Table.GetLocation(commandDetail.To_X, commandDetail.To_Y);
+                        
+                        if (targetLocation == null)
                         {
-                            WriteError("from location parameter is wrong!");
+                            WriteError("Location is not found!");
                             command = WaitCommand();
                             continue;
                         }
-
-                        if (Table.xAxisConverter.ContainsKey(from[0].ToString()) == false || Table.xAxisConverter.ContainsKey(to[0].ToString()) == false)
-                        {
-                            WriteError("Lokasyon yanlış!");
-                            command = WaitCommand();
-                            continue;
-                        }
-
-                        int fromX = Table.xAxisConverter[from[0].ToString()];
-                        int fromY = int.Parse(from[1].ToString());
-
-                        int toX = Table.xAxisConverter[to[0].ToString()];
-                        int toY = int.Parse(to[1].ToString());
-
-
-                        var stone = CurrentPlayer.Stones.FirstOrDefault(s => s.Location == Table.GetLocation(fromX, fromY));
-                        var targetLocation = Table.GetLocation(toX, toY);
 
                         if (stone == null)
                         {
-                            WriteError("Taş bulunamadı!");
+                            WriteError("Stone is not found at given location!");
                             command = WaitCommand();
                             continue;
                         }
 
-                        if (targetLocation == null)
-                        {
-                            WriteError("Lokasyon bulunamadı!");
-                            command = WaitCommand();
-                            continue;
-                        }
-
-                        var instraction = Movement.MovementInstraction.CreateOne(stone, targetLocation, Table);
+                        var instraction = MovementInstraction.CreateOne(stone, targetLocation, this);
                         
                         var result = instraction.TryDo();
-                        //stone.Move(targetLocation, Table);
                         if (result.IsOK)
                         {
+                            MovementInstractions.Add(instraction, result);
+
                             if (result.Eated != null)
                             {
                                 CurrentPlayer.Eat(result.Eated);
                                 Table.Stones.Remove(result.Eated);
-                                DrawToConsole();
                             }
 
-                            int indexer = CurrentIndexer + 1;
-                            CurrentIndexer = indexer % 2;
-                            CurrentPlayer = Players[CurrentIndexer];
-                            WriteMessage(result.Message);
+                            if (result.CheckRemoved)
+                            {
+                                Check = false;
+                            }
 
-                            Console.Clear();
-                            DrawToConsole();
+                            WriteMessage(result.Message);
+                            IsCheck(stone);
+
+                            SessionTimer.Stop();
+                            CurrentPlayer.Duration += SessionTimer.ElapsedMilliseconds;
+
+                            SetPlayerReturn();
+                            DrawTable();
+
+                            SessionTimer.Restart();
                         }
                         else
                         {
@@ -268,118 +287,24 @@ namespace Thrones.Gaming.Chess.SessionManagement
             }
         }
 
-        private void WriteMessage(string message)
+        protected void SetPlayerReturn()
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{DateTime.Now} - [system]> {message}");
-            Console.ResetColor();
+            int indexer = CurrentIndexer + 1;
+            CurrentIndexer = indexer % 2;
+            CurrentPlayer = Players[CurrentIndexer];
+            NextPlayer = Players[CurrentIndexer == 0 ? 1 : 0];
         }
 
-        private void WriteError(string error)
+        private void IsCheck(IStone stone)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{DateTime.Now} - [system]> {error}");
-            Console.ResetColor();
-        }
-
-        private string WaitCommand()
-        {
-            Console.WriteLine();
-            Console.WriteLine("------------------------------------------------------------------------------------------");
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine();
-            Console.Write($"{DateTime.Now} - [player: {CurrentPlayer.Nickname}]>");
-            Console.ResetColor();
-            return Console.ReadLine();
-        }
-
-        private void DrawToConsole()
-        {
-            List<IStone> allStones = new List<IStone>();
-            allStones.AddRange(Players.SelectMany(i => i.Stones));
-
-            Console.WindowHeight = 45;
-            if (CurrentPlayer == Players[0])
+            King king = NextPlayer.GetKing();
+            if (stone.TryMove(king.Location, Table, out IStone k))
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            Console.WriteLine($"                              {Players[0].Nickname} # duration: {Players[0].Duration}                              ");
-            Console.ResetColor();
-            Console.WriteLine();
-
-            Console.WriteLine("       a          b          c          d          e          f          g          h      ");
-            Console.WriteLine(" _________________________________________________________________________________________ ");
-            for (int yAxis = 8; yAxis > 0; yAxis--)
-            {
-                Console.Write(" |          ");
-                for (int xAxis = 1; xAxis < 8; xAxis++)
-                {
-                    string show = "          ";
-                    Console.Write($"|{show}");
-                }
-                Console.Write("|");
-                Console.WriteLine();
-
-                Console.Write($"{Table.yAxis[yAxis]}|");
-                for (int xAxis = 1; xAxis <= 8; xAxis++)
-                {
-                    var location = Table.GetLocation(xAxis, yAxis);
-                    var stone = allStones.FirstOrDefault(s => s.Location == location);
-
-                    string show = "          ";
-                    if (stone != null)
-                    {
-                        var name = stone.NameWithColorPrefix;
-                        var kalan = 10 - name.Length;
-                        string empty = "";
-                        for (int i = 0; i < kalan; i++)
-                        {
-                            empty += " ";
-                        }
-                        show = name + empty;
-                    }
-                    Console.Write($"{show}|");
-                }
-                Console.Write($"{Table.yAxis[yAxis]}");
-                Console.WriteLine();
-
-                Console.Write(" |__________");
-                for (int xAxis = 1; xAxis < 8; xAxis++)
-                {
-                    string show = "__________";
-                    Console.Write($"|{show}");
-                }
-                Console.Write("|");
-                Console.WriteLine();
-            }
-            Console.WriteLine("       a          b          c          d          e          f          g          h      ");
-
-            Console.WriteLine();
-            if (CurrentPlayer == Players[1])
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-            }
-            Console.WriteLine($"                              {Players[1].Nickname} # duration: {Players[1].Duration}                              ");
-            Console.ResetColor();
-        }
-
-        private void DrawStatistics()
-        {
-            foreach (var player in Players)
-            {
-                Console.WriteLine();
-
-                Console.WriteLine($"   {player.Nickname}   ");
-                Console.WriteLine("______________");
-
-                foreach (var eat in player.Eats)
-                {
-                    Console.WriteLine($"> {eat.Name}");
-                }
-
-                Console.WriteLine();
+                Check = true;
+                CheckStone = stone;
+                WriteMessage("CHECK");
             }
         }
+
     }
 }

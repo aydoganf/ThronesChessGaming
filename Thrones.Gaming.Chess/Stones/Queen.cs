@@ -12,17 +12,17 @@ namespace Thrones.Gaming.Chess.Stones
         {
         }
 
-        public override bool Move(Location target, Table table, out IStone eated)
+        public override bool TryMove(Location target, Table table, out IStone willEated)
         {
-            eated = default;
+            willEated = default;
             if (CheckMove(target) == false)
             {
                 return false;
             }
 
-            var targetLocationStone = table.Stones.FirstOrDefault(s => s.Location == target);
+            var targetLocationStone = table.Stones.GetFromLocation(target);
             var span = target - Location;
-            
+
             // çapraz gidiş
             if (span.XDiff == span.YDiff)
             {
@@ -31,16 +31,15 @@ namespace Thrones.Gaming.Chess.Stones
                 {
                     return result;
                 }
-                
+
                 if (targetLocationStone != null)
                 {
-                    eated = targetLocationStone;
-                    //Player.Eat(targetLocationStone);
+                    willEated = targetLocationStone;
                 }
             }
 
             // yatay || dikey gidiş
-            if (span.XDiff == 0 ||span.YDiff == 0)
+            if (span.XDiff == 0 || span.YDiff == 0)
             {
                 var result = MovementRules.HorizontalOrVerticalCheck(Location, target, table);
                 if (result == false)
@@ -50,12 +49,10 @@ namespace Thrones.Gaming.Chess.Stones
 
                 if (targetLocationStone != null)
                 {
-                    eated = targetLocationStone;
-                    //Player.Eat(targetLocationStone);
+                    willEated = targetLocationStone;
                 }
             }
 
-            base.Move(target);
             return true;
         }
 
