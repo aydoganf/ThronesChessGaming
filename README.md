@@ -5,6 +5,6 @@
   - **play [from] [to]** (ex: play g5 g7): use it to play stone
   - **stat**: use it to view game statistics
   - **draw**: use it to draw table to console
-  - **quit**: use it to quit game
+  - **quit | exit**: use it to quit game
   - **undo**: use it to undo last movement
  * Simply, run ChessPlaying.exe and enjoy!

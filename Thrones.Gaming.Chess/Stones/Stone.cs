@@ -63,6 +63,7 @@ namespace Thrones.Gaming.Chess.Stones
         public void ForceMove(Location target)
         {
             Location = target;
+            MoveCount--;
         }
     }
 }

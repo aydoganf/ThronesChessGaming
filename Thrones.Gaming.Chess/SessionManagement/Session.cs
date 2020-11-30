@@ -180,7 +180,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
             SessionTimer = new Stopwatch();
             SessionTimer.Start();
 
-            while (command != "quit")
+            while (command != "quit" && command != "exit")
             {
                 if (string.IsNullOrEmpty(command))
                 {
@@ -212,6 +212,8 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
                             MovementInstractions.Remove(lastInstraction);
                             DrawTable();
+
+                            SessionTimer.Restart();
                         }
                     }
 
