@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Thrones.Gaming.Chess.Coordinate;
 using Thrones.Gaming.Chess.Players;
 using Thrones.Gaming.Chess.SessionManagement;
@@ -7,7 +8,7 @@ namespace Thrones.Gaming.Chess.Stones
 {
     public abstract class Stone : IStone
     {
-        public string Name { get; protected set; }
+        public string Name => $"{GetType().Name.ToLower()}#{Location.Name}";
         public bool CouldMove { get; protected set; }
         public EnumStoneColor Color { get; protected set; }
         public Location StoredLocation { get; set; }
@@ -19,7 +20,7 @@ namespace Thrones.Gaming.Chess.Stones
 
         public Stone(string name, bool couldMove, EnumStoneColor color, Location location, Player player)
         {
-            Name = name;
+            //Name = name;
             CouldMove = couldMove;
             Color = color;
             Location = location;
@@ -27,7 +28,7 @@ namespace Thrones.Gaming.Chess.Stones
             MoveCount = 0;
         }
 
-        protected abstract bool CheckMove(Location target);
+        protected abstract bool CheckMove(Location target, Table table);
 
         public virtual bool Move(Location target, Table table, out IStone eated) 
         {
@@ -65,5 +66,12 @@ namespace Thrones.Gaming.Chess.Stones
             Location = target;
             MoveCount--;
         }
+
+        public void SetPlayer(Player player)
+        {
+            Player = player;
+        }
+
+        public abstract List<Location> GetMovementLocations(Location target, Table table);
     }
 }

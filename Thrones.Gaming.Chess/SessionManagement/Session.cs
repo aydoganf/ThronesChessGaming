@@ -22,6 +22,8 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
         private IGameProvider _gameProvider;
         public bool Check { get; protected set; }
+        public bool Checkmate { get; private set; }
+
         public IStone CheckStone { get; set; }
 
         private Stopwatch SessionTimer { get; set; }
@@ -83,7 +85,6 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 stones.Add(rookRight);
 
                 #endregion
-
 
                 #region Knights
                 Knight knightLeft = default;
@@ -191,11 +192,20 @@ namespace Thrones.Gaming.Chess.SessionManagement
                     if (command == "draw")
                     {
                         DrawTable();
+                        if (Checkmate)
+                        {
+                            WriteError("Checkmate !!!");
+                        }
                     }
 
                     if (command == "undo")
                     {
-                        if (MovementInstractions.Keys.Count != 0)
+                        if (Checkmate)
+                        {
+                            WriteError("Checkmate !!!");
+                        }
+
+                        if (Checkmate == false && MovementInstractions.Keys.Count != 0)
                         {
                             var lastInstraction = MovementInstractions.Keys.Last();
                             var lastResult = MovementInstractions[lastInstraction];
@@ -217,7 +227,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
                         }
                     }
 
-                    if (command.StartsWith("play"))
+                    if (Checkmate == false && command.StartsWith("play"))
                     {
                         var commandDetail = CommandResolver.Resolve(command);
                         if (commandDetail.IsCorrect == false)
@@ -268,10 +278,20 @@ namespace Thrones.Gaming.Chess.SessionManagement
                             SessionTimer.Stop();
                             CurrentPlayer.Duration += SessionTimer.ElapsedMilliseconds;
 
-                            SetPlayerReturn();
-                            DrawTable();
+                            if (Checkmate)
+                            {
+                                DrawTable();
+                                WriteError("Checkmate !!!");
+                            }
+                            else
+                            {
+                                SetPlayerReturn();
+                                DrawTable();
 
-                            SessionTimer.Restart();
+                                SessionTimer.Restart();
+                            }
+
+                            
                         }
                         else
                         {
@@ -304,9 +324,79 @@ namespace Thrones.Gaming.Chess.SessionManagement
             {
                 Check = true;
                 CheckStone = stone;
-                WriteMessage("CHECK");
+                //WriteMessage("CHECK");
+            }
+
+            if (Check)
+            {
+                IsCheckmate(stone);
+                if (Checkmate)
+                {
+                    //WriteMessage("CHECKMATE !!!");
+                }
             }
         }
 
+        private void IsCheckmate(IStone stone)
+        {
+            // check yapan taşı yiyebilecek bir taş var mı?
+            bool checkStoneCouldEated = false;
+            foreach (var nextPlayerStone in NextPlayer.Stones)
+            {
+                if (nextPlayerStone.TryMove(stone.Location, Table, out IStone _s))
+                {
+                    checkStoneCouldEated = true;
+                    break;
+                }
+            }
+
+            if (checkStoneCouldEated)
+            {
+                return;
+            }
+
+
+            // başka bir taş kral ile check yapan taş arasına girebilir mi?
+            var king = NextPlayer.GetKing();
+            bool someStoneBroked = false;
+
+            List<Location> checkLocations = stone.GetMovementLocations(king.Location, Table);
+            if (checkLocations != null)
+            {
+                foreach (var checkLocation in checkLocations)
+                {
+                    foreach (var nextPlayerStone in NextPlayer.Stones)
+                    {
+                        if (nextPlayerStone is King)
+                        {
+                            continue;
+                        }
+
+                        if (nextPlayerStone.TryMove(checkLocation, Table, out IStone _s))
+                        {
+                            someStoneBroked = true;
+                            break;
+                        }
+                    }
+
+                    if (someStoneBroked) break;
+                }
+            }
+
+            if ((stone is Knight) == false && someStoneBroked == false)
+            {
+                Checkmate = true;
+                Check = false;
+            }
+        }
+
+        public ISession AddPlayer(string nickname, EnumStoneColor color, List<IStone> stones)
+        {
+            var player = Player.CreateOne(nickname, color, Table);
+            player.SetStones(stones);
+            Players.Add(player);
+            Table.AddStones(stones);
+            return this;
+        }
     }
 }

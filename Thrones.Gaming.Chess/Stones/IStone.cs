@@ -1,4 +1,5 @@
-﻿using Thrones.Gaming.Chess.Coordinate;
+﻿using System.Collections.Generic;
+using Thrones.Gaming.Chess.Coordinate;
 using Thrones.Gaming.Chess.Players;
 using Thrones.Gaming.Chess.SessionManagement;
 
@@ -13,11 +14,14 @@ namespace Thrones.Gaming.Chess.Stones
         Location GhostLocation { get; }
         Player Player { get; }
 
+        void SetPlayer(Player player);
+
         bool Move(Location target, Table table, out IStone eated);
         bool TryMove(Location target, Table table, out IStone willEated);
 
         void GhostMove(Location target);
         void UndoGhost();
         void ForceMove(Location target);
+        List<Location> GetMovementLocations(Location target, Table table);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Thrones.Gaming.Chess.Movement;
+using Thrones.Gaming.Chess.SessionManagement;
 
 namespace Thrones.Gaming.Chess.Coordinate
 {
@@ -11,12 +12,12 @@ namespace Thrones.Gaming.Chess.Coordinate
 
         public int Y { get; private set; }
 
-        public string Name { get; private set; }
+        public string Name => $"{Table.xAxis[X]}{Y}";
 
 
         public Location(string name, int x, int y)
         {
-            Name = name;
+            //Name = name;
             X = x;
             Y = y;
         }

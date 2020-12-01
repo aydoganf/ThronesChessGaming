@@ -11,14 +11,59 @@ namespace Thrones.Gaming.Chess.Stones
 {
     public class Rook : Stone
     {
-        public Rook(string name, bool couldMove, EnumStoneColor color, Location location, Player player) : base(name, couldMove, color, location, player)
+        internal Rook(string name, bool couldMove, EnumStoneColor color, Location location, Player player) : base(name, couldMove, color, location, player)
         {
+        }
+
+        public Rook(EnumStoneColor color, int x, int y) : base(string.Empty, true, color, SessionFactory.GetTable().GetLocation(x, y), null)
+        {
+        }
+
+        public override List<Location> GetMovementLocations(Location target, Table table)
+        {
+            List<Location> result = null;
+
+            if (CheckMove(target, table))
+            {
+                result = new List<Location>();
+                var span = target - Location;
+
+                // horizontal
+                if (span.YMovement == MovementDirection.None)
+                {
+                    int currentY = Location.Y;
+                    int currentX = Location.X;
+                    for (int i = 1; i <= span.XDiff; i++)
+                    {
+                        currentX += span.XMovement == MovementDirection.Forward ? 1: -1;
+
+                        var location = table.GetLocation(currentX, currentY);
+                        result.Add(location);
+                    }
+                }
+
+                // vertical
+                if (span.XMovement == MovementDirection.None)
+                {
+                    int currentY = Location.Y;
+                    int currentX = Location.X;
+                    for (int i = 1; i <= span.YDiff; i++)
+                    {
+                        currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
+
+                        var location = table.GetLocation(currentX, currentY);
+                        result.Add(location);
+                    }
+                }
+            }
+
+            return result;
         }
 
         public override bool TryMove(Location target, Table table, out IStone willEated)
         {
             willEated = default;
-            if (CheckMove(target) == false)
+            if (CheckMove(target, table) == false)
             {
                 return false;
             }
@@ -32,7 +77,7 @@ namespace Thrones.Gaming.Chess.Stones
             return true;
         }
                 
-        protected override bool CheckMove(Location target)
+        protected override bool CheckMove(Location target, Table table)
         {
             // gidilecek location'da kendi taşı varsa
             if (Player.Stones.FirstOrDefault(s => s.Location == target) != null)

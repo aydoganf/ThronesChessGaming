@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Thrones.Gaming.Chess.Coordinate;
 using Thrones.Gaming.Chess.Movement;
 using Thrones.Gaming.Chess.Players;
@@ -8,14 +9,70 @@ namespace Thrones.Gaming.Chess.Stones
 {
     public class Queen : Stone
     {
-        public Queen(string name, bool couldMove, EnumStoneColor color, Location location, Player player) : base(name, couldMove, color, location, player)
+        internal Queen(string name, bool couldMove, EnumStoneColor color, Location location, Player player) : base(name, couldMove, color, location, player)
         {
+        }
+
+        public Queen(EnumStoneColor color, int x, int y) : base(string.Empty, true, color, SessionFactory.GetTable().GetLocation(x, y), null)
+        {
+        }
+
+        public override List<Location> GetMovementLocations(Location target, Table table)
+        {
+            List<Location> result = null;
+
+            if (CheckMove(target, table))
+            {
+                result = new List<Location>();
+
+                int currentX = Location.X;
+                int currentY = Location.Y;
+                var span = target - Location;
+
+                // çapraz gidiş
+                if (span.XDiff == span.YDiff)
+                {
+                    for (int i = 1; i <= span.XDiff; i++)
+                    {
+                        currentX += span.XMovement == MovementDirection.Forward ? 1 : -1;
+                        currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
+
+                        result.Add(table.GetLocation(currentX, currentY));
+                    }
+                }
+
+                // yatay-dikey gidiş
+                else
+                {
+                    // dikey
+                    if (span.XDiff == 0)
+                    {
+                        for (int i = 1; i <= span.YDiff; i++)
+                        {
+                            currentY += 1;
+                            result.Add(table.GetLocation(currentX, currentY));
+                        }
+                    }
+
+                    // yatay
+                    else
+                    {
+                        for (int i = 1; i <= span.XDiff; i++)
+                        {
+                            currentX += 1;
+                            result.Add(table.GetLocation(currentX, currentY));
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         public override bool TryMove(Location target, Table table, out IStone willEated)
         {
             willEated = default;
-            if (CheckMove(target) == false)
+            if (CheckMove(target, table) == false)
             {
                 return false;
             }
@@ -56,7 +113,7 @@ namespace Thrones.Gaming.Chess.Stones
             return true;
         }
 
-        protected override bool CheckMove(Location target)
+        protected override bool CheckMove(Location target, Table table)
         {
             // gidilecek location'da kendi taşı varsa
             if (Player.Stones.FirstOrDefault(s => s.Location == target) != null)

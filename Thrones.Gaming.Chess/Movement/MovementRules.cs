@@ -69,34 +69,17 @@ namespace Thrones.Gaming.Chess.Movement
 
             for (int i = 1; i <= targetLocationBorder; i++)
             {
-                int checkX = currentX;
-                int checkY = currentY;
-
                 if (span.YDiff == 0)
                 {
-                    if (span.XMovement == MovementDirection.Forward)
-                    {
-                        checkX += 1;
-                    }
-                    else
-                    {
-                        checkX -= 1;
-                    }
+                    currentX += span.XMovement == MovementDirection.Forward ? 1 : -1;
                 }
 
                 if (span.XDiff == 0)
                 {
-                    if (span.YMovement == MovementDirection.Forward)
-                    {
-                        checkY += 1;
-                    }
-                    else
-                    {
-                        checkY -= 1;
-                    }
+                    currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
                 }
 
-                var checkLocation = table.Locations.FirstOrDefault(l => l.X == checkX && l.Y == checkY);
+                var checkLocation = table.GetLocation(currentX, currentY);
                 if (checkLocation == null)
                 {
                     return false;

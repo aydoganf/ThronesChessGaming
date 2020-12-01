@@ -44,6 +44,19 @@ namespace Thrones.Gaming.Chess.Movement
                 if (MovingStone is King)
                 {
                     // check another stone could eat king
+                    foreach (var nexPlayerStone in Session.NextPlayer.Stones)
+                    {
+                        if (nexPlayerStone.TryMove(Location, Session.Table, out IStone _k))
+                        {
+                            isOk = false;
+                            break;
+                        }
+                    }
+
+                    if (isOk)
+                    {
+                        checkRemoved = true;
+                    }
                 }
 
                 // başka bir taş oynanıyor ve yenilecek olan taş şah çekilen

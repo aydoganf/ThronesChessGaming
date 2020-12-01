@@ -41,6 +41,10 @@ namespace Thrones.Gaming.Chess.Players
             }
 
             Stones = stones;
+            foreach (var stone in Stones)
+            {
+                stone.SetPlayer(this);
+            }
         }
 
         internal void Eat(IStone stone)
@@ -58,12 +62,10 @@ namespace Thrones.Gaming.Chess.Players
         {
             if (Color == EnumStoneColor.Black)
             {
-                // e8
-                return (King)Stones.FirstOrDefault(s => s.Location == _table.GetLocation(5, 8));
+                return (King)Stones.FirstOrDefault(s => s is King);
             }
 
-            // e1
-            return (King)Stones.FirstOrDefault(s => s.Location == _table.GetLocation(5, 1));
+            return (King)Stones.FirstOrDefault(s => s is King);
         }
     }
 }
