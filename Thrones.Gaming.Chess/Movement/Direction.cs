@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Thrones.Gaming.Chess.Movement
 {
-    public enum MovementDirection
+    public enum Direction
     {
         None,
         Forward,

@@ -29,13 +29,13 @@ namespace Thrones.Gaming.Chess.Stones
                 var span = target - Location;
 
                 // horizontal
-                if (span.YMovement == MovementDirection.None)
+                if (span.YMovement == Direction.None)
                 {
                     int currentY = Location.Y;
                     int currentX = Location.X;
                     for (int i = 1; i <= span.XDiff; i++)
                     {
-                        currentX += span.XMovement == MovementDirection.Forward ? 1: -1;
+                        currentX += span.XMovement == Direction.Forward ? 1: -1;
 
                         var location = table.GetLocation(currentX, currentY);
                         result.Add(location);
@@ -43,13 +43,13 @@ namespace Thrones.Gaming.Chess.Stones
                 }
 
                 // vertical
-                if (span.XMovement == MovementDirection.None)
+                if (span.XMovement == Direction.None)
                 {
                     int currentY = Location.Y;
                     int currentX = Location.X;
                     for (int i = 1; i <= span.YDiff; i++)
                     {
-                        currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
+                        currentY += span.YMovement == Direction.Forward ? 1 : -1;
 
                         var location = table.GetLocation(currentX, currentY);
                         result.Add(location);

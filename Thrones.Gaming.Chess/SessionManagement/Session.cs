@@ -27,7 +27,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
         public IStone CheckStone { get; set; }
         private Stopwatch SessionTimer { get; set; }
-        protected Dictionary<MovementInstraction, MovementResult> MovementInstractions { get; set; } = new Dictionary<MovementInstraction, MovementResult>();
+        protected Dictionary<Instruction, MovementResult> MovementInstructions { get; set; } = new Dictionary<Instruction, MovementResult>();
         protected List<string> StartingCommands { get; set; } = new List<string>();
 
         protected Session(string name, IGameProvider gameProvider) 
@@ -189,7 +189,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
         public abstract void WriteLastCommand(string rawCommand);
         public abstract void DrawStatistics();
 
-        private MovementInstraction GetLastMovement() => MovementInstractions.Keys.LastOrDefault(); 
+        private Instruction GetLastMovement() => MovementInstructions.Keys.LastOrDefault(); 
 
         public void Start()
         {
@@ -238,10 +238,10 @@ namespace Thrones.Gaming.Chess.SessionManagement
                             WriteError("Checkmate !!!");
                         }
 
-                        if (Checkmate == false && MovementInstractions.Keys.Count != 0)
+                        if (Checkmate == false && MovementInstructions.Keys.Count != 0)
                         {
                             var lastInstraction = GetLastMovement();
-                            var lastResult = MovementInstractions[lastInstraction];
+                            var lastResult = MovementInstructions[lastInstraction];
 
                             if (lastResult.Eated != null)
                             {
@@ -253,7 +253,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
                             SetPlayerReturn();
 
-                            MovementInstractions.Remove(lastInstraction);
+                            MovementInstructions.Remove(lastInstraction);
                             DrawTable();
 
                             SessionTimer.Restart();
@@ -289,12 +289,12 @@ namespace Thrones.Gaming.Chess.SessionManagement
                             continue;
                         }
 
-                        var instraction = MovementInstraction.CreateOne(stone, targetLocation, this, $"{DateTime.Now} - [player: {CurrentPlayer.Nickname}]>{command}");
+                        var instraction = Instruction.CreateOne(stone, targetLocation, this, $"{DateTime.Now} - [player: {CurrentPlayer.Nickname}]>{command}");
                         
                         var result = instraction.TryDo();
                         if (result.IsOK)
                         {
-                            MovementInstractions.Add(instraction, result);
+                            MovementInstructions.Add(instraction, result);
 
                             if (result.Eated != null)
                             {

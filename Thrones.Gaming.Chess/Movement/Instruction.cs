@@ -6,7 +6,7 @@ using Thrones.Gaming.Chess.Stones;
 
 namespace Thrones.Gaming.Chess.Movement
 {
-    public class MovementInstraction
+    public class Instruction
     {
         public IStone MovingStone { get; private set; }
         public Location FromLocation { get; private set; }
@@ -15,7 +15,7 @@ namespace Thrones.Gaming.Chess.Movement
         public MovementResult Result { get; private set; }
         public string RawCommand { get; private set; }
 
-        private MovementInstraction(IStone stone, Location target, Session session, string rawCommand)
+        private Instruction(IStone stone, Location target, Session session, string rawCommand)
         {
             MovingStone = stone;
             Target = target;
@@ -24,9 +24,9 @@ namespace Thrones.Gaming.Chess.Movement
             FromLocation = stone.Location;
         }
 
-        public static MovementInstraction CreateOne(IStone stone, Location target, Session session, string rawCommand)
+        public static Instruction CreateOne(IStone stone, Location target, Session session, string rawCommand)
         {
-            return new MovementInstraction(stone, target, session, rawCommand);
+            return new Instruction(stone, target, session, rawCommand);
         }
 
         public MovementResult TryDo()

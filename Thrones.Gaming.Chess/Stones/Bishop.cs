@@ -32,8 +32,8 @@ namespace Thrones.Gaming.Chess.Stones
 
                 for (int i = 1; i <= span.XDiff; i++)
                 {
-                    currentX += span.XMovement == MovementDirection.Forward ? 1 : -1;
-                    currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
+                    currentX += span.XMovement == Direction.Forward ? 1 : -1;
+                    currentY += span.YMovement == Direction.Forward ? 1 : -1;
 
                     var location = table.GetLocation(currentX, currentY);
                     result.Add(location);

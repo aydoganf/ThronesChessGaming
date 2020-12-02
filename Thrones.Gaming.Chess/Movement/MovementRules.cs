@@ -19,7 +19,7 @@ namespace Thrones.Gaming.Chess.Movement
 
             for (int i = 1; i <= span.XDiff; i++)
             {
-                if (span.XMovement == MovementDirection.Forward)
+                if (span.XMovement == Direction.Forward)
                 {
                     currentX += 1;
                 }
@@ -29,7 +29,7 @@ namespace Thrones.Gaming.Chess.Movement
                 }
 
 
-                if (span.YMovement == MovementDirection.Forward)
+                if (span.YMovement == Direction.Forward)
                 {
                     currentY += 1;
                 }
@@ -71,12 +71,12 @@ namespace Thrones.Gaming.Chess.Movement
             {
                 if (span.YDiff == 0)
                 {
-                    currentX += span.XMovement == MovementDirection.Forward ? 1 : -1;
+                    currentX += span.XMovement == Direction.Forward ? 1 : -1;
                 }
 
                 if (span.XDiff == 0)
                 {
-                    currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
+                    currentY += span.YMovement == Direction.Forward ? 1 : -1;
                 }
 
                 var checkLocation = table.GetLocation(currentX, currentY);

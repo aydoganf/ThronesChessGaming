@@ -65,17 +65,17 @@ namespace Thrones.Gaming.Chess.Stones
             var span = target - Location;
 
             // piyon sadece ileri gidebilir.
-            if (Color == EnumStoneColor.Black && span.YMovement == MovementDirection.Forward)
+            if (Color == EnumStoneColor.Black && span.YMovement == Direction.Forward)
             {
                 return false;
             }
 
-            if (Color == EnumStoneColor.White && span.YMovement == MovementDirection.Backward)
+            if (Color == EnumStoneColor.White && span.YMovement == Direction.Backward)
             {
                 return false;
             }
 
-            if (span.YMovement == MovementDirection.None)
+            if (span.YMovement == Direction.None)
             {
                 return false;
             }
@@ -102,12 +102,12 @@ namespace Thrones.Gaming.Chess.Stones
 
 
             // gitme yönünde 1 birim ötede bir taş varsa hareket edemez.
-            if (span.XMovement == MovementDirection.None && table.Stones.FirstOrDefault(s => s.Location == target) != null)
+            if (span.XMovement == Direction.None && table.Stones.FirstOrDefault(s => s.Location == target) != null)
             {
                 return false;
             }
 
-            if (span.YMovement == MovementDirection.None && span.XDiff > 1)
+            if (span.YMovement == Direction.None && span.XDiff > 1)
             {
                 return false;
             }

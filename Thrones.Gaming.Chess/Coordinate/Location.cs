@@ -26,27 +26,27 @@ namespace Thrones.Gaming.Chess.Coordinate
         {
             int xDiff = target.X - current.X;
             int yDiff = target.Y - current.Y;
-            var xMovement = MovementDirection.None;
-            var yMovement = MovementDirection.None;
+            var xMovement = Direction.None;
+            var yMovement = Direction.None;
 
             if (xDiff > 0)
             {
-                xMovement = MovementDirection.Forward;
+                xMovement = Direction.Forward;
             }
             else if (xDiff < 0) 
             {
                 xDiff *= -1;
-                xMovement = MovementDirection.Backward;
+                xMovement = Direction.Backward;
             }
 
             if (yDiff > 0)
             {
-                yMovement = MovementDirection.Forward;
+                yMovement = Direction.Forward;
             }
             else if (yDiff < 0) 
             { 
                 yDiff *= -1;
-                yMovement = MovementDirection.Backward;
+                yMovement = Direction.Backward;
             }
 
             return new LocationSpan(xDiff, yDiff, xMovement, yMovement);

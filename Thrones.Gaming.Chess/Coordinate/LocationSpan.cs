@@ -9,12 +9,12 @@ namespace Thrones.Gaming.Chess.Coordinate
     {
         public int XDiff { get; private set; }
         public int YDiff { get; private set; }
-        public MovementDirection XMovement { get; private set; }
-        public MovementDirection YMovement { get; private set; }
+        public Direction XMovement { get; private set; }
+        public Direction YMovement { get; private set; }
         public bool IsDiagonal { get; private set; }
 
 
-        public LocationSpan(int xDiff, int yDiff, MovementDirection xMovement, MovementDirection yMovement) : this()
+        public LocationSpan(int xDiff, int yDiff, Direction xMovement, Direction yMovement) : this()
         {
             XDiff = xDiff;
             YDiff = yDiff;
