@@ -49,7 +49,8 @@ namespace Thrones.Gaming.Chess.Stones
                     {
                         for (int i = 1; i <= span.YDiff; i++)
                         {
-                            currentY += 1;
+                            currentY += span.YMovement == MovementDirection.Forward ? 1 : -1;
+
                             result.Add(table.GetLocation(currentX, currentY));
                         }
                     }
@@ -59,14 +60,15 @@ namespace Thrones.Gaming.Chess.Stones
                     {
                         for (int i = 1; i <= span.XDiff; i++)
                         {
-                            currentX += 1;
+                            currentX += span.XMovement == MovementDirection.Forward ? 1 : -1;
+
                             result.Add(table.GetLocation(currentX, currentY));
                         }
                     }
                 }
             }
 
-            return null;
+            return result;
         }
 
         public override bool TryMove(Location target, Table table, out IStone willEated)

@@ -44,7 +44,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (span.XDiff == 1 && span.YDiff == 1)
             {
                 var enemyStone = table.Stones.FirstOrDefault(s => s.Location == target);
-                if (enemyStone == null)
+                if (enemyStone == null || enemyStone.Player == this.Player)
                 {
                     return false;
                 }
@@ -75,10 +75,15 @@ namespace Thrones.Gaming.Chess.Stones
                 return false;
             }
 
+            if (span.YMovement == MovementDirection.None)
+            {
+                return false;
+            }
+
             // --------------------
 
             // ilk hareketi değil ise bir kareden fazla gidemez
-            if (MoveCount > 0 && span.XDiff > 1)
+            if (MoveCount > 0 && span.YDiff > 1)
             {
                 return false;
             }
@@ -95,18 +100,14 @@ namespace Thrones.Gaming.Chess.Stones
                 return false;
             }
 
-            // çapraz gitme kuralı
-            if (span.XMovement == MovementDirection.Backward || span.XMovement == MovementDirection.Forward)
-            {
-                var targetLocationStone = table.Stones.FirstOrDefault(s => s.Location == target);
-                if (targetLocationStone == null || targetLocationStone.Player == this.Player)
-                {
-                    return false;
-                }
-            }
 
             // gitme yönünde 1 birim ötede bir taş varsa hareket edemez.
             if (span.XMovement == MovementDirection.None && table.Stones.FirstOrDefault(s => s.Location == target) != null)
+            {
+                return false;
+            }
+
+            if (span.YMovement == MovementDirection.None && span.XDiff > 1)
             {
                 return false;
             }

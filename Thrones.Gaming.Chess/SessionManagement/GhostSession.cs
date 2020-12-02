@@ -70,6 +70,9 @@ namespace Thrones.Gaming.Chess.SessionManagement
             GC.SuppressFinalize(this);
         }
 
-
+        public override void WriteEmpty()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

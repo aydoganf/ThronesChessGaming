@@ -149,5 +149,10 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 Console.WriteLine();
             }
         }
+
+        public override void WriteEmpty()
+        {
+            Console.WriteLine();
+        }
     }
 }

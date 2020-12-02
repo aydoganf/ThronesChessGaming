@@ -12,5 +12,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
         ISession AddPlayers(string blackPlayerNickname, string whitePlayerNickname);
 
         ISession AddPlayer(string nickname, EnumStoneColor color, List<IStone> stones);
+
+        ISession AddStartingCommands(string[] commands);
     }
 }

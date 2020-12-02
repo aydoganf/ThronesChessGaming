@@ -12,6 +12,8 @@ namespace Thrones.Gaming.Chess.SessionManagement
 {
     public abstract class Session : ISession
     {
+        private IGameProvider _gameProvider;
+
         public string Name { get; protected set; }
         public Table Table { get; protected set; }
         public List<Player> Players { get; protected set; }
@@ -19,15 +21,14 @@ namespace Thrones.Gaming.Chess.SessionManagement
         public Player NextPlayer { get; protected set; }
         public Player PreviousPlayer => NextPlayer;
         private int CurrentIndexer = 0;
-
-        private IGameProvider _gameProvider;
+        
         public bool Check { get; protected set; }
         public bool Checkmate { get; private set; }
 
         public IStone CheckStone { get; set; }
-
         private Stopwatch SessionTimer { get; set; }
         protected Dictionary<MovementInstraction, MovementResult> MovementInstractions { get; set; } = new Dictionary<MovementInstraction, MovementResult>();
+        protected List<string> StartingCommands { get; set; } = new List<string>();
 
         protected Session(string name, IGameProvider gameProvider) 
         {
@@ -168,6 +169,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
         public abstract void DrawTable();
         public abstract void WriteMessage(string message);
         public abstract void WriteError(string error);
+        public abstract void WriteEmpty();
         public abstract string WaitCommand();
         public abstract void DrawStatistics();
 
@@ -175,8 +177,15 @@ namespace Thrones.Gaming.Chess.SessionManagement
         {
             CurrentPlayer = Players[CurrentIndexer];
             NextPlayer = Players[CurrentIndexer == 0 ? 1 : 0];
+            
             DrawTable();
+
             string command = string.Empty;
+            if (StartingCommands.Count != 0)
+            {
+                command = StartingCommands[0];
+            }
+            
 
             SessionTimer = new Stopwatch();
             SessionTimer.Start();
@@ -281,6 +290,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
                             if (Checkmate)
                             {
                                 DrawTable();
+                                WriteEmpty();
                                 WriteError("Checkmate !!!");
                             }
                             else
@@ -305,7 +315,23 @@ namespace Thrones.Gaming.Chess.SessionManagement
                     }
                 }
 
-                command = WaitCommand();
+                if (StartingCommands.Count == 0)
+                {
+                    command = WaitCommand();
+                }
+                else
+                {
+                    var current = StartingCommands.First();
+                    StartingCommands.Remove(current);
+                    if (StartingCommands.Count != 0)
+                    {
+                        command = StartingCommands[0];
+                    }
+                    else
+                    {
+                        command = WaitCommand();
+                    }
+                }
             }
         }
 
@@ -324,7 +350,6 @@ namespace Thrones.Gaming.Chess.SessionManagement
             {
                 Check = true;
                 CheckStone = stone;
-                //WriteMessage("CHECK");
             }
 
             if (Check)
@@ -332,32 +357,87 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 IsCheckmate(stone);
                 if (Checkmate)
                 {
-                    //WriteMessage("CHECKMATE !!!");
+                    Check = false;
                 }
             }
         }
 
         private void IsCheckmate(IStone stone)
         {
+            var king = NextPlayer.GetKing();
+
             // check yapan taşı yiyebilecek bir taş var mı?
             bool checkStoneCouldEated = false;
+            IStone checkStoneEater = null;
             foreach (var nextPlayerStone in NextPlayer.Stones)
             {
                 if (nextPlayerStone.TryMove(stone.Location, Table, out IStone _s))
                 {
-                    checkStoneCouldEated = true;
-                    break;
+                    bool nextPlayerStoneCouldMove = true;
+                    // şah çeken taşı yiyebilecek olan taş bu hareketi yapabilir mi?
+                    nextPlayerStone.GhostMove(stone.Location);
+
+                    foreach (var currentPlayerStone in CurrentPlayer.Stones)
+                    {
+                        if (currentPlayerStone == stone)
+                        {
+                            // şah çeken taşı yediğini varsayıyoruz
+                            continue;
+                        }
+
+                        if (currentPlayerStone.TryMove(king.Location, Table, out IStone _k))
+                        {
+                            // danger
+                            // nextPlayerStone could not move!!
+                            nextPlayerStoneCouldMove = false;                            
+                            break;
+                        }
+                    }
+
+                    nextPlayerStone.UndoGhost();
+
+                    if (nextPlayerStoneCouldMove)
+                    {
+                        checkStoneCouldEated = true;
+                        checkStoneEater = nextPlayerStone;
+                        break;
+                    }
                 }
             }
 
             if (checkStoneCouldEated)
             {
+                if (checkStoneEater is King)
+                {
+                    // stone'u o lokasyondan geçici olarak alalım
+                    // daha sonra o lokasyona bir taş gidebilir mi ona bakalım.
+                    // gidemiyorsa stone'u o laskyona geri alalım
+                    stone.GhostMove(null);
+
+                    foreach (var currentPlayerStone in CurrentPlayer.Stones)
+                    {
+                        if (currentPlayerStone == stone)
+                        {
+                            continue;
+                        }
+
+                        if (currentPlayerStone.TryMove(stone.StoredLocation, Table, out IStone _k))
+                        {
+                            Checkmate = true;
+                            stone.UndoGhost();
+                            return;
+                        }
+                    }
+
+                    stone.UndoGhost();
+                }
+
                 return;
             }
 
 
             // başka bir taş kral ile check yapan taş arasına girebilir mi?
-            var king = NextPlayer.GetKing();
+            
             bool someStoneBroked = false;
 
             List<Location> checkLocations = stone.GetMovementLocations(king.Location, Table);
@@ -383,7 +463,14 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 }
             }
 
-            if ((stone is Knight) == false && someStoneBroked == false)
+            //if ((stone is Knight) == false && someStoneBroked == false)
+            //{
+            //    Checkmate = true;
+            //    Check = false;
+            //}
+
+            // king kaçabilir mi?
+            if (someStoneBroked == false && king.CouldRun(Table) == false)
             {
                 Checkmate = true;
                 Check = false;
@@ -396,6 +483,13 @@ namespace Thrones.Gaming.Chess.SessionManagement
             player.SetStones(stones);
             Players.Add(player);
             Table.AddStones(stones);
+            return this;
+        }
+
+        public ISession AddStartingCommands(string[] commands)
+        {
+            StartingCommands = commands.ToList();
+
             return this;
         }
     }

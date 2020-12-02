@@ -12,6 +12,7 @@ namespace Thrones.Gaming.Chess.Stones
         string Name { get; }
         Location Location { get; }
         Location GhostLocation { get; }
+        Location StoredLocation { get; }
         Player Player { get; }
 
         void SetPlayer(Player player);

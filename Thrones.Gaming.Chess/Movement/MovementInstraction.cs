@@ -10,28 +10,36 @@ namespace Thrones.Gaming.Chess.Movement
     {
         public IStone MovingStone { get; private set; }
         public Location FromLocation { get; private set; }
-        public Location Location { get; private set; }
+        public Location Target { get; private set; }
         public Session Session { get; private set; }
+        public MovementResult Result { get; private set; }
 
-        private MovementInstraction(IStone stone, Location location, Session session)
+        private MovementInstraction(IStone stone, Location target, Session session)
         {
             MovingStone = stone;
-            Location = location;
+            Target = target;
             Session = session;
             FromLocation = stone.Location;
         }
 
-        public static MovementInstraction CreateOne(IStone stone, Location location, Session session)
+        public static MovementInstraction CreateOne(IStone stone, Location target, Session session)
         {
-            return new MovementInstraction(stone, location, session);
+            return new MovementInstraction(stone, target, session);
         }
 
         public MovementResult TryDo()
         {
             IStone willEated = default;
-            if (MovingStone.TryMove(Location, Session.Table, out willEated) != true)
+
+            var preMoveResult = PreMove();
+            if (preMoveResult.IsOK == false)
             {
-                return new MovementResult(false, MovingStone, null, Location, "Oraya olmaz!");
+                return preMoveResult;
+            }
+
+            if (MovingStone.TryMove(Target, Session.Table, out willEated) != true)
+            {
+                return new MovementResult(false, MovingStone, null, Target, "Oraya olmaz!");
             }
 
             bool isOk = true;
@@ -40,27 +48,7 @@ namespace Thrones.Gaming.Chess.Movement
 
             if (Session.Check)
             {
-                // oynanan taş king ise
-                if (MovingStone is King)
-                {
-                    // check another stone could eat king
-                    foreach (var nexPlayerStone in Session.NextPlayer.Stones)
-                    {
-                        if (nexPlayerStone.TryMove(Location, Session.Table, out IStone _k))
-                        {
-                            isOk = false;
-                            break;
-                        }
-                    }
-
-                    if (isOk)
-                    {
-                        checkRemoved = true;
-                    }
-                }
-
-                // başka bir taş oynanıyor ve yenilecek olan taş şah çekilen
-                else if (willEated == Session.CheckStone)
+                if (willEated == Session.CheckStone)
                 {
                     isOk = true;
                     checkRemoved = true;
@@ -70,7 +58,7 @@ namespace Thrones.Gaming.Chess.Movement
                 else
                 {
                     // CurrentPlayer'ın MovingStone'u o lokasyona ghostMove yapar.
-                    MovingStone.GhostMove(Location);
+                    MovingStone.GhostMove(Target);
 
                     // Şuanki durumda CurrentPlayer'a sıra geçecektir.
                     var king = Session.CurrentPlayer.GetKing();
@@ -84,34 +72,66 @@ namespace Thrones.Gaming.Chess.Movement
                         isOk = true;
                         checkRemoved = true;
                     }
+
+                    MovingStone.UndoGhost();
                 }
+            }
+
+            if (isOk)
+            {
+                MovingStone.Move(Target, Session.Table, out willEated);
+                return new MovementResult(true, MovingStone, willEated, Target, "OK", checkRemoved);
+            }
+
+            return new MovementResult(false, MovingStone, null, Target, message);
+        }
+
+        private MovementResult PreMove()
+        {
+            if (MovingStone is King)
+            {
+                return CheckKingMove();
             }
             else
             {
-                var kingLocation = Session.CurrentPlayer.GetKing().Location;
-                MovingStone.GhostMove(Location);
+                MovingStone.GhostMove(Target);
+                bool couldMove = true;
+                IStone willEated = null;
 
-                foreach (var enemyStone in Session.NextPlayer.Stones)
+                foreach (var nextPlayerStone in Session.NextPlayer.Stones)
                 {
-                    var moveCheck = enemyStone.TryMove(kingLocation, Session.Table, out IStone _k);
-                    if (moveCheck)
+                    if (nextPlayerStone.TryMove(Session.CurrentPlayer.GetKing().Location, Session.Table, out willEated))
                     {
-                        isOk = false;
-                        message = "Protect your KING!";
+                        couldMove = false;
                         break;
                     }
                 }
 
                 MovingStone.UndoGhost();
+                return new MovementResult(couldMove, MovingStone, willEated, Target, couldMove ? "OK" : "Protect your KING!");
             }
+        }
 
-            if (isOk)
+        private MovementResult CheckKingMove()
+        {
+            MovingStone.GhostMove(Target);
+            bool couldMove = true;
+            IStone willEated = null;
+            IStone eater = null;
+
+            foreach (var nextPlayerStone in Session.NextPlayer.Stones)
             {
-                MovingStone.Move(Location, Session.Table, out willEated);
-                return new MovementResult(true, MovingStone, willEated, Location, "OK", checkRemoved);
+                if (nextPlayerStone.TryMove(MovingStone.Location, Session.Table, out willEated))
+                {
+                    couldMove = false;
+                    eater = nextPlayerStone;
+                    break;
+                }
             }
 
-            return new MovementResult(false, MovingStone, null, Location, message);
+            MovingStone.UndoGhost();
+
+            return new MovementResult(couldMove, MovingStone, willEated, Target, couldMove ? "OK" : $"No way man.. {eater.Name} will kill your King!");
         }
     }
 }
