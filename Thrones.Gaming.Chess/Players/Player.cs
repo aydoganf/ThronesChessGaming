@@ -14,23 +14,26 @@ namespace Thrones.Gaming.Chess.Players
         public long Duration { get; internal set; }
         public List<IStone> Stones { get; private set; }
         public List<IStone> Eats { get; private set; }
-        public EnumStoneColor Color { get; private set; }
-        
-        private Table _table { get; set; }
+        public EnumStoneColor Color { get; private set; }        
 
         private Player()
         {
         }
 
-        public static Player CreateOne(string nickname, EnumStoneColor color, Table table)
+        public static Player CreateOne(string nickname, EnumStoneColor color)
         {
             var player = new Player();
             player.Nickname = nickname;
             player.Stones = new List<IStone>();
             player.Eats = new List<IStone>();
             player.Color = color;
-            player._table = table;
             return player;
+        }
+
+        internal void AddStone(IStone stone)
+        {
+            this.Stones.Add(stone);
+            stone.SetPlayer(this);
         }
 
         internal void SetStones(List<IStone> stones)
@@ -51,11 +54,6 @@ namespace Thrones.Gaming.Chess.Players
         {
             stone.Player.Stones.Remove(stone);
             Eats.Add(stone);
-        }
-
-        internal IStone GetStone(int x, int y)
-        {
-            return Stones.FirstOrDefault(s => s.Location == _table.GetLocation(x, y));
         }
 
         internal King GetKing()

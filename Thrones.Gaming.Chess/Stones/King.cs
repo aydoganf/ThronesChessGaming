@@ -80,61 +80,61 @@ namespace Thrones.Gaming.Chess.Stones
 
             // left
             var left = table.GetLocation(Location.X - 1, Location.Y);
-            if (left == null || TryMove(left, table, out _s) == false)
+            if (left != null && TryMove(left, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // left-top
             var leftTop = table.GetLocation(Location.X - 1, Location.Y + 1);
-            if (leftTop == null || TryMove(leftTop, table, out _s) == false)
+            if (leftTop != null && TryMove(leftTop, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // top
             var top = table.GetLocation(Location.X, Location.Y + 1);
-            if (top == null || TryMove(top, table, out _s) == false)
+            if (top != null && TryMove(top, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // right-top
             var rightTop = table.GetLocation(Location.X + 1, Location.Y + 1);
-            if (rightTop == null || TryMove(rightTop, table, out _s) == false)
+            if (rightTop != null && TryMove(rightTop, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // right
             var right = table.GetLocation(Location.X + 1, Location.Y);
-            if (right == null || TryMove(right, table, out _s) == false)
+            if (right != null && TryMove(right, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // right-bottom
             var rightBottom = table.GetLocation(Location.X + 1, Location.Y - 1);
-            if (rightBottom == null || TryMove(rightBottom, table, out _s) == false)
+            if (rightBottom != null && TryMove(rightBottom, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // bottom
             var bottom = table.GetLocation(Location.X, Location.Y - 1);
-            if (bottom == null || TryMove(bottom, table, out _s) == false)
+            if (bottom != null && TryMove(bottom, table, out _s))
             {
-                return false;
+                return true;
             }
 
             // left-bottom
             var leftBottom = table.GetLocation(Location.X - 1, Location.Y - 1);
-            if (leftBottom == null || TryMove(leftBottom, table, out _s) == false)
+            if (leftBottom != null && TryMove(leftBottom, table, out _s))
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Thrones.Gaming.Chess.SessionManagement
@@ -14,6 +15,12 @@ namespace Thrones.Gaming.Chess.SessionManagement
             var milliseconds = time - (hours * 360000) - (minutes * 60000) - (seconds * 1000);
 
             return $"{hours}h: {minutes}m: {seconds}.{milliseconds}s";
+        }
+
+        public static TValue GetLast<TKey, TValue>(this Dictionary<TKey, TValue> keyValuePairs)
+        {
+            TKey lastKey = keyValuePairs.Keys.Last();
+            return keyValuePairs[lastKey];
         }
     }
 }

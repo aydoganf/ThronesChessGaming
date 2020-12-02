@@ -1,26 +1,18 @@
-﻿using System.Collections.Generic;
-using Thrones.Gaming.Chess.Players;
-using Thrones.Gaming.Chess.Provider;
-using Thrones.Gaming.Chess.Stones;
+﻿using System;
 
 namespace Thrones.Gaming.Chess.SessionManagement
 {
-    public enum SessionType
-    {
-        Console
-    }
-
     public static class SessionFactory
     {
         private static ISession session;
 
-        public static ISession CreateOne(string name, IGameProvider gameProvider, SessionType sessionType)
+        public static ISession CreateOne<TSession>(string name) where TSession : Session
         {
-            return sessionType switch
-            {
-                SessionType.Console => session = new ConsoleSession(name, gameProvider),
-                _ => null,
-            };
+            var newSession = (Session)Activator.CreateInstance(typeof(TSession));
+
+            newSession.SetName(name);
+            session = newSession;
+            return session;
         }
 
         public static Table GetTable() => session.Table;

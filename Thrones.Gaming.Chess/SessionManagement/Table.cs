@@ -9,7 +9,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
 {
     public class Table
     {
-        internal static Dictionary<string, int> xAxisConverter = new Dictionary<string, int>
+        public static Dictionary<string, int> xAxisConverter = new Dictionary<string, int>
         {
             { "a", 1 },
             { "b", 2 },
@@ -21,7 +21,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
             { "h", 8 },
         };
 
-        internal static Dictionary<int, string> xAxis = new Dictionary<int, string>()
+        public static Dictionary<int, string> xAxis = new Dictionary<int, string>()
         {
             { 1, "a" },
             { 2, "b" },
@@ -32,7 +32,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
             { 7, "g" },
             { 8, "h" },
         };
-        internal static Dictionary<int, string> yAxis = new Dictionary<int, string>()
+        public static Dictionary<int, string> yAxis = new Dictionary<int, string>()
         {
             { 1, "1" },
             { 2, "2" },

@@ -13,18 +13,20 @@ namespace Thrones.Gaming.Chess.Movement
         public Location Target { get; private set; }
         public Session Session { get; private set; }
         public MovementResult Result { get; private set; }
+        public string RawCommand { get; private set; }
 
-        private MovementInstraction(IStone stone, Location target, Session session)
+        private MovementInstraction(IStone stone, Location target, Session session, string rawCommand)
         {
             MovingStone = stone;
             Target = target;
             Session = session;
+            RawCommand = rawCommand;
             FromLocation = stone.Location;
         }
 
-        public static MovementInstraction CreateOne(IStone stone, Location target, Session session)
+        public static MovementInstraction CreateOne(IStone stone, Location target, Session session, string rawCommand)
         {
-            return new MovementInstraction(stone, target, session);
+            return new MovementInstraction(stone, target, session, rawCommand);
         }
 
         public MovementResult TryDo()

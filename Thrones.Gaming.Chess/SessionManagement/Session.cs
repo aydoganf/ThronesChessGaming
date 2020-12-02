@@ -33,9 +33,24 @@ namespace Thrones.Gaming.Chess.SessionManagement
         protected Session(string name, IGameProvider gameProvider) 
         {
             Name = name;
+            CreateNew();
+            _gameProvider = gameProvider;
+        }
+
+        public Session()
+        {
+            CreateNew();
+        }
+
+        private void CreateNew()
+        {
             Table = Table.CreateOne();
             Players = new List<Player>();
-            _gameProvider = gameProvider;
+        }
+
+        public void SetName(string name)
+        {
+            Name = name;
         }
 
         public ISession AddPlayers(string blackPlayerNickname, string whitePlayerNickname)
@@ -50,7 +65,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
                     color = EnumStoneColor.White;
                 }
                 string nickname = players[i];
-                var player = Player.CreateOne(nickname, color, Table);
+                var player = Player.CreateOne(nickname, color);
 
                 #region Pawns
 
@@ -171,7 +186,10 @@ namespace Thrones.Gaming.Chess.SessionManagement
         public abstract void WriteError(string error);
         public abstract void WriteEmpty();
         public abstract string WaitCommand();
+        public abstract void WriteLastCommand(string rawCommand);
         public abstract void DrawStatistics();
+
+        private MovementInstraction GetLastMovement() => MovementInstractions.Keys.LastOrDefault(); 
 
         public void Start()
         {
@@ -198,6 +216,12 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 }
                 else
                 {
+                    string[] commandArr = command.Split(' ');
+                    if (commandArr.Length == 2 && commandArr[0].Length == 2 && commandArr[1].Length == 2)
+                    {
+                        command = $"play {command}";
+                    }
+                    
                     if (command == "draw")
                     {
                         DrawTable();
@@ -216,7 +240,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
                         if (Checkmate == false && MovementInstractions.Keys.Count != 0)
                         {
-                            var lastInstraction = MovementInstractions.Keys.Last();
+                            var lastInstraction = GetLastMovement();
                             var lastResult = MovementInstractions[lastInstraction];
 
                             if (lastResult.Eated != null)
@@ -246,7 +270,9 @@ namespace Thrones.Gaming.Chess.SessionManagement
                             continue;
                         }
 
-                        var stone = CurrentPlayer.GetStone(commandDetail.From_X, commandDetail.From_Y);
+                        var fromLocation = Table.GetLocation(commandDetail.From_X, commandDetail.From_Y);
+
+                        var stone = Table.Stones.GetFromLocation(fromLocation); 
                         var targetLocation = Table.GetLocation(commandDetail.To_X, commandDetail.To_Y);
                         
                         if (targetLocation == null)
@@ -263,7 +289,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
                             continue;
                         }
 
-                        var instraction = MovementInstraction.CreateOne(stone, targetLocation, this);
+                        var instraction = MovementInstraction.CreateOne(stone, targetLocation, this, $"{DateTime.Now} - [player: {CurrentPlayer.Nickname}]>{command}");
                         
                         var result = instraction.TryDo();
                         if (result.IsOK)
@@ -317,6 +343,12 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
                 if (StartingCommands.Count == 0)
                 {
+                    var lastMovementInstaction = GetLastMovement();
+                    if (lastMovementInstaction != null)
+                    {
+                        WriteLastCommand(lastMovementInstaction.RawCommand);
+                    }
+
                     command = WaitCommand();
                 }
                 else
@@ -329,6 +361,11 @@ namespace Thrones.Gaming.Chess.SessionManagement
                     }
                     else
                     {
+                        var lastMovementInstaction = GetLastMovement();
+                        if (lastMovementInstaction != null)
+                        {
+                            WriteLastCommand(lastMovementInstaction.RawCommand);
+                        }
                         command = WaitCommand();
                     }
                 }
@@ -479,10 +516,17 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
         public ISession AddPlayer(string nickname, EnumStoneColor color, List<IStone> stones)
         {
-            var player = Player.CreateOne(nickname, color, Table);
+            var player = Player.CreateOne(nickname, color);
             player.SetStones(stones);
             Players.Add(player);
             Table.AddStones(stones);
+            return this;
+        }
+
+        public ISession AddPlayer(Player player)
+        {
+            Players.Add(player);
+            Table.AddStones(player.Stones);
             return this;
         }
 

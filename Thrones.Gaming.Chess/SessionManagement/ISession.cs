@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Thrones.Gaming.Chess.Players;
 using Thrones.Gaming.Chess.Stones;
 
 namespace Thrones.Gaming.Chess.SessionManagement
@@ -12,6 +13,8 @@ namespace Thrones.Gaming.Chess.SessionManagement
         ISession AddPlayers(string blackPlayerNickname, string whitePlayerNickname);
 
         ISession AddPlayer(string nickname, EnumStoneColor color, List<IStone> stones);
+
+        ISession AddPlayer(Player player);
 
         ISession AddStartingCommands(string[] commands);
     }

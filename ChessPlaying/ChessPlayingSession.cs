@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Thrones.Gaming.Chess.Provider;
+using Thrones.Gaming.Chess.SessionManagement;
 using Thrones.Gaming.Chess.Stones;
 
-namespace Thrones.Gaming.Chess.SessionManagement
+namespace ChessPlaying
 {
-    public sealed class ConsoleSession : Session
+    public class ChessPlayingSession : Session
     {
-        internal ConsoleSession(string name, IGameProvider gameProvider) : base(name, gameProvider)
+        public ChessPlayingSession()
         {
-
         }
-
 
         public override void WriteMessage(string message)
         {
@@ -153,6 +152,13 @@ namespace Thrones.Gaming.Chess.SessionManagement
         public override void WriteEmpty()
         {
             Console.WriteLine();
+        }
+
+        public override void WriteLastCommand(string rawCommand)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(rawCommand);
+            Console.ResetColor();
         }
     }
 }
