@@ -3,6 +3,7 @@
 * This is a simple chess gaming with Console app
 * You can use three command after game begin:
   - **play [from] [to]** (ex: play g5 g7): to play a stone
+  - or you can play like **[from] [to]** directly (ex: f2 e4)
   - **stat**: to view game statistics
   - **draw**: to draw table to console
   - **quit | exit**: to quit game
