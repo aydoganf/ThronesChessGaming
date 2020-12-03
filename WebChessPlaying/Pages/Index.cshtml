@@ -1,0 +1,32 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Please give the session name below:</p>
+    <p>
+        <input type="text" class="form-control-lg" id="session-name" /> <button id="enter-session" class="btn btn-lg btn-primary">Enter</button>
+    </p>
+    <p>OR create a new session</p>
+    <p>
+        <input type="text" class="form-control-lg" placeholder="nickname" id="nickname" /> <button id="create-session" class="btn btn-lg btn-success">Create</button> 
+    </p>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#enter-session').click(function () {
+
+            window.location.href = "https://localhost:44327/session/view/" + $('#session-name').val();
+
+        });
+
+    });
+
+</script>

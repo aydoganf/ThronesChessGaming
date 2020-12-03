@@ -96,12 +96,19 @@ namespace Thrones.Gaming.Chess.Movement
             }
             else
             {
+                var targetLocationStone = Session.Table.Stones.GetFromLocation(Target);
                 MovingStone.GhostMove(Target);
+                
                 bool couldMove = true;
                 IStone willEated = null;
 
                 foreach (var nextPlayerStone in Session.NextPlayer.Stones)
                 {
+                    if (nextPlayerStone == targetLocationStone)
+                    {
+                        continue;
+                    }
+
                     if (nextPlayerStone.TryMove(Session.CurrentPlayer.GetKing().Location, Session.Table, out willEated))
                     {
                         couldMove = false;

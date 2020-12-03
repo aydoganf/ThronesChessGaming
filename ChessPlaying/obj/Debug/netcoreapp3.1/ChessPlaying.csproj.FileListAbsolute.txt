@@ -14,3 +14,4 @@ C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\Chess
 C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.dll
 C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.pdb
 C:\Users\faruk\source\repos\ChessGame\ChessPlaying\obj\Debug\netcoreapp3.1\ChessPlaying.genruntimeconfig.cache
+C:\Users\faruk\source\repos\ChessGame\ChessPlaying\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll

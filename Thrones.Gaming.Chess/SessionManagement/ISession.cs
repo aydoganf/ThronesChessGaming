@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Thrones.Gaming.Chess.Logging;
 using Thrones.Gaming.Chess.Players;
 using Thrones.Gaming.Chess.Stones;
 
@@ -17,5 +18,13 @@ namespace Thrones.Gaming.Chess.SessionManagement
         ISession AddPlayer(Player player);
 
         ISession AddStartingCommands(string[] commands);
+
+        ISession SetLogger(ILogger logger);
+
+        ISession SetIndexer(int currentIndexer);
+
+        SessionInformation Command(string command);
+
+        SessionInformation GetInformation();
     }
 }

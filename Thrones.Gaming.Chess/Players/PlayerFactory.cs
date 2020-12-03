@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,7 +36,7 @@ namespace Thrones.Gaming.Chess.Players
     {
         private readonly Player _player;
 
-        private Dictionary<Type, int> StoneTypeCountMap = new Dictionary<Type, int>()
+        private readonly Dictionary<Type, int> StoneTypeCountMap = new Dictionary<Type, int>()
         {
             { typeof(King), 1 },
             { typeof(Queen), 1 },
@@ -68,15 +69,62 @@ namespace Thrones.Gaming.Chess.Players
         /// <exception cref="InvalidOperationException"></exception>
         public PlayerBuilder AddStone<TStone>(int x, int y) where TStone : Stone
         {
-            var stoneCount = _player.Stones.Count(s => s.GetType() == typeof(TStone));
-            if (stoneCount == StoneTypeCountMap[typeof(TStone)])
+            return AddStone(typeof(TStone), x, y);
+        }
+
+        /// <summary>
+        /// Adds the given type of stone to current player.
+        /// </summary>
+        /// <param name="type">
+        /// <see cref="Type"/> information of stone
+        /// </param>
+        /// <param name="x">
+        /// The x-coordinate of position of stone
+        /// </param>
+        /// <param name="y">
+        /// The y-coordinate of position of stone
+        /// </param>
+        /// <returns>
+        /// <see cref="PlayerBuilder"/>
+        /// </returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public PlayerBuilder AddStone(Type type, int x, int y)
+        {
+            if (type.BaseType == null || type.BaseType != typeof(Stone))
             {
-                throw new InvalidOperationException($"Player has already {stoneCount} piece of {typeof(TStone).Name}.");
+                throw new InvalidOperationException("Type is not Stone type!");
             }
 
-            IStone stone = (IStone)Activator.CreateInstance(typeof(TStone), _player.Color, x, y);
+            var stoneCount = _player.Stones.Count(s => s.GetType() == type);
+            if (stoneCount == StoneTypeCountMap[type])
+            {
+                throw new InvalidOperationException($"Player has already {stoneCount} piece of {type.Name}.");
+            }
+
+            IStone stone = (IStone)Activator.CreateInstance(type, _player.Color, x, y);
             _player.AddStone(stone);
             return this;
+        }
+
+
+        /// <summary>
+        /// Adds the given type of stone to current player.
+        /// </summary>
+        /// <param name="stoneInfo">
+        /// This string should be deserializable to <see cref="StoneInformation"/>
+        /// </param>
+        /// <returns>
+        /// <see cref="PlayerBuilder"/>
+        /// </returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public PlayerBuilder AddStone(string stoneInfo)
+        {
+            return AddStone(JsonConvert.DeserializeObject<StoneInformation>(stoneInfo));
+        }
+
+        public PlayerBuilder AddStone(StoneInformation stoneInformation)
+        {
+            return AddStone(Type.GetType(stoneInformation.GetFullTypeName()), stoneInformation.GetXLocation(), stoneInformation.GetYLocation());
         }
 
 

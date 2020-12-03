@@ -1,0 +1,13 @@
+12/3/2020 9:22:53 AM - [player: faruk]>play h8 g8
+12/3/2020 9:22:57 AM - [player: ali]>play b1 b7
+12/3/2020 9:23:03 AM - [player: faruk]>play c5 b7
+12/3/2020 9:23:10 AM - [player: ali]>play d2 c3
+12/3/2020 9:23:24 AM - [player: faruk]>play e5 f3
+12/3/2020 9:23:31 AM - [player: ali]>play e1 e2
+12/3/2020 9:23:35 AM - [player: faruk]>play f3 g1
+12/3/2020 9:23:37 AM - [player: ali]>play e2 e1
+12/3/2020 9:23:45 AM - [player: faruk]>play g8 g3
+12/3/2020 9:23:56 AM - [player: ali]>play c3 d2
+12/3/2020 9:23:59 AM - [player: faruk]>play g1 f3
+12/3/2020 9:24:09 AM - [player: ali]>play e1 d1
+12/3/2020 9:24:11 AM - [player: faruk]>play d8 d2

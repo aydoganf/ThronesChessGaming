@@ -1,0 +1,72 @@
+﻿
+@{
+    string sessionName = ViewBag.SessionName;
+    ViewData["Title"] = "View";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Chess Session</h1>
+<hr />
+@{ 
+    <div class="row">
+        <div class="col-md-9">
+            <table class="table table-bordered" id="board">
+                @for (int y = 8; y > 0; y--)
+                {
+                    var bg = "#d18b47";
+
+
+                    <tr>
+                        @for (int x = 1; x <= 8; x++)
+                        {
+
+                            bg = (y + x) % 2 == 0 ? "#d18b47" : "#ffce9e";
+                            <td style="background:@bg;width:80px;height:80px;" data-x="@x" data-y="@y">
+
+                            </td>
+                        }
+                    </tr>
+
+                }
+            </table>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    
+}
+
+
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $.ajax({
+            url: 'http://localhost:5000/api/chess',
+            contentType: 'application/json;charset=utf-8',
+            dataType: 'json',
+            method: 'GET',
+            headers: { SessionName: '@sessionName' },
+            success: function (data) {
+                console.log(data);
+
+                for (var i = 0; i < data.table.stones.length; i++) {
+                    var stoneInfo = data.table.stones[i];
+
+                    var icon = '/lib/icons/' + stoneInfo.type.toLowerCase() + '-' + stoneInfo.color.toLowerCase() + '.png';
+                    var locationX = stoneInfo.location.split('|')[0];
+                    var locationY = stoneInfo.location.split('|')[1];
+
+                    $('#board td[data-x="' + locationX + '"][data-y="' + locationY + '"]').html("<img src='" + icon + "' />");
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+                console.log(errorThrown);
+            }
+        })
+
+    });
+
+</script>

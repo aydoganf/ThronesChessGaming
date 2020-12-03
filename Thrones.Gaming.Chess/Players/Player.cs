@@ -20,7 +20,7 @@ namespace Thrones.Gaming.Chess.Players
         {
         }
 
-        public static Player CreateOne(string nickname, EnumStoneColor color)
+        internal static Player CreateOne(string nickname, EnumStoneColor color)
         {
             var player = new Player();
             player.Nickname = nickname;
