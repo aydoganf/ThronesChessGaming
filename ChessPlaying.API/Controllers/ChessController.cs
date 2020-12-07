@@ -47,7 +47,8 @@ namespace ChessPlaying.API.Controllers
                 return Unauthorized();
             }
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<SessionInformation>(_chessDbService.GetSession(sessionName).SessionInfo);
+            var sessionInfo = _chessDbService.GetSession(sessionName).SessionInfo;
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<SessionInformation>(sessionInfo);
         }
 
 
@@ -57,7 +58,12 @@ namespace ChessPlaying.API.Controllers
             var session = _chessDbService.GetSession(sessionName);
 
             var chessSession = SessionFactory.CreateFrom(session.SessionInfo);
-            return chessSession.Command(request.Command);
+            var sessionInfo = chessSession.Command(request.Command);
+
+            session.SessionInfo = Newtonsoft.Json.JsonConvert.SerializeObject(sessionInfo);
+            _chessDbService.UpdateSession(session);
+
+            return sessionInfo;
         }
     }
 }

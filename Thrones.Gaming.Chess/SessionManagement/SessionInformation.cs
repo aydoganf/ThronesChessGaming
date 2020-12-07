@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Thrones.Gaming.Chess.Movement;
 using Thrones.Gaming.Chess.Players;
 
 namespace Thrones.Gaming.Chess.SessionManagement
@@ -12,5 +13,6 @@ namespace Thrones.Gaming.Chess.SessionManagement
         public int CurrentIndexer { get; set; }
         public List<PlayerInformation> Players { get; set; }
         public TableInformation Table { get; set; }
+        public MovementResultInformation MovementResult { get; set; }
     }
 }

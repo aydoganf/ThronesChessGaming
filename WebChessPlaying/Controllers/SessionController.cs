@@ -8,9 +8,10 @@ namespace WebChessPlaying.Controllers
 {
     public class SessionController : Controller
     {
-        public IActionResult View(Guid id)
+        public IActionResult View(Guid id, [FromQuery(Name = "nickname")] string nickname)
         {
             ViewBag.SessionName = id.ToString();
+            ViewBag.PlayerNickname = nickname;
             return View();
         }
     }

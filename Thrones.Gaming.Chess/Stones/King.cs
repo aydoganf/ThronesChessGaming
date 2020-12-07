@@ -77,64 +77,131 @@ namespace Thrones.Gaming.Chess.Stones
         public bool CouldRun(Table table)
         {
             IStone _s = null;
+            bool leftOpen = false;
+            bool leftTopOpen = false;
+            bool topOpen = false;
+            bool rightTopOpen = false;
+            bool rightOpen = false;
+            bool rightBottomOpen = false;
+            bool bottomOpen = false;
+            bool leftBottomOpen = false;
+            var enemyStones = table.Stones.Where(s => s.Player != this.Player);
 
             // left
             var left = table.GetLocation(Location.X - 1, Location.Y);
             if (left != null && TryMove(left, table, out _s))
             {
-                return true;
+                leftOpen = true;
+                foreach (var enemyStone in enemyStones)
+                {
+                    if (enemyStone.TryMove(left, table, out IStone _e))
+                    {
+                        leftOpen = false;
+                        break;
+                    }
+                }
             }
 
             // left-top
             var leftTop = table.GetLocation(Location.X - 1, Location.Y + 1);
             if (leftTop != null && TryMove(leftTop, table, out _s))
             {
-                return true;
+                leftTopOpen = true;
+                foreach (var enemyStone in enemyStones)
+                {
+                    if (enemyStone.TryMove(leftTop, table, out IStone _e))
+                    {
+                        leftTopOpen = false;
+                        break;
+                    }
+                }
             }
 
             // top
             var top = table.GetLocation(Location.X, Location.Y + 1);
             if (top != null && TryMove(top, table, out _s))
             {
-                return true;
+                topOpen = true;
+                foreach (var enemtStone in enemyStones)
+                {
+                    if (enemtStone.TryMove(top, table, out IStone _e))
+                    {
+                        topOpen = false;
+                    }
+                }
             }
 
             // right-top
             var rightTop = table.GetLocation(Location.X + 1, Location.Y + 1);
             if (rightTop != null && TryMove(rightTop, table, out _s))
             {
-                return true;
+                rightTopOpen = true;
+                foreach (var enemtStone in enemyStones)
+                {
+                    if (enemtStone.TryMove(rightTop, table, out IStone _e))
+                    {
+                        rightTopOpen = false;
+                    }
+                }
             }
 
             // right
             var right = table.GetLocation(Location.X + 1, Location.Y);
             if (right != null && TryMove(right, table, out _s))
             {
-                return true;
+                rightOpen = false;
+                foreach (var enemtStone in enemyStones)
+                {
+                    if (enemtStone.TryMove(right, table, out IStone _e))
+                    {
+                        rightOpen = false;
+                    }
+                }
             }
 
             // right-bottom
             var rightBottom = table.GetLocation(Location.X + 1, Location.Y - 1);
             if (rightBottom != null && TryMove(rightBottom, table, out _s))
             {
-                return true;
+                rightBottomOpen = true;
+                foreach (var enemtStone in enemyStones)
+                {
+                    if (enemtStone.TryMove(rightBottom, table, out IStone _e))
+                    {
+                        rightBottomOpen = false;
+                    }
+                }
             }
 
             // bottom
             var bottom = table.GetLocation(Location.X, Location.Y - 1);
             if (bottom != null && TryMove(bottom, table, out _s))
             {
-                return true;
+                bottomOpen = true;
+                foreach (var enemtStone in enemyStones)
+                {
+                    if (enemtStone.TryMove(bottom, table, out IStone _e))
+                    {
+                        bottomOpen = false;
+                    }
+                }
             }
 
             // left-bottom
             var leftBottom = table.GetLocation(Location.X - 1, Location.Y - 1);
             if (leftBottom != null && TryMove(leftBottom, table, out _s))
             {
-                return true;
+                leftBottomOpen = true;
+                foreach (var enemtStone in enemyStones)
+                {
+                    if (enemtStone.TryMove(leftBottom, table, out IStone _e))
+                    {
+                        leftBottomOpen = false;
+                    }
+                }
             }
 
-            return false;
+            return leftOpen || leftTopOpen || topOpen || rightTopOpen || rightOpen || rightBottomOpen || bottomOpen || leftBottomOpen;
         }
     }
 }

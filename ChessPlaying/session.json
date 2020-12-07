@@ -1,0 +1,111 @@
+{
+  "Name": "66fb0ca0-350e-4095-9073-ac42ec3872ab",
+  "FullTypeName": "ChessPlaying.ChessPlayingSession",
+  "CurrentIndexer": 1,
+  "Players": [
+    {
+      "Nickname": "Faruk",
+      "Duration": 0
+    },
+    {
+      "Nickname": "Ned",
+      "Duration": 0
+    }
+  ],
+  "Table": {
+    "Stones": [
+      {
+        "Type": "Pawn",
+        "Color": "Black",
+        "Location": "1|7"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "Black",
+        "Location": "5|5"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "Black",
+        "Location": "6|4"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "Black",
+        "Location": "7|4"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "Black",
+        "Location": "8|7"
+      },
+      {
+        "Type": "Rook",
+        "Color": "Black",
+        "Location": "3|8"
+      },
+      {
+        "Type": "Rook",
+        "Color": "Black",
+        "Location": "8|8"
+      },
+      {
+        "Type": "Knight",
+        "Color": "Black",
+        "Location": "5|4"
+      },
+      {
+        "Type": "Queen",
+        "Color": "Black",
+        "Location": "3|4"
+      },
+      {
+        "Type": "King",
+        "Color": "Black",
+        "Location": "4|8"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "White",
+        "Location": "4|4"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "White",
+        "Location": "6|2"
+      },
+      {
+        "Type": "Pawn",
+        "Color": "White",
+        "Location": "8|6"
+      },
+      {
+        "Type": "Bishop",
+        "Color": "White",
+        "Location": "1|3"
+      },
+      {
+        "Type": "King",
+        "Color": "White",
+        "Location": "4|1"
+      }
+    ]
+  },
+  "MovementResult": {
+    "IsOK": false,
+    "Location": {
+      "X": 3,
+      "Y": 2,
+      "Name": "c2"
+    },
+    "Message": "No way man.. rook#c8 will kill your King!",
+    "CheckRemoved": false,
+    "Check": false,
+    "Checkmate": false,
+    "Stone": {
+      "Type": "King",
+      "Color": "White",
+      "Location": "4|1"
+    }
+  }
+}

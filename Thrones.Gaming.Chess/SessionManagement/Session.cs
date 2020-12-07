@@ -625,6 +625,8 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 if (commandDetail.IsCorrect == false)
                 {
                     WriteError(commandDetail.ReturnMessage);
+
+                    MovementInstructions.Add(default, new MovementResult(false, null, null, null, commandDetail.ReturnMessage));
                     return SessionInformation;
                 }
 
@@ -638,12 +640,16 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 if (targetLocation == null)
                 {
                     WriteError("Location is not found!");
+
+                    MovementInstructions.Add(default, new MovementResult(false, stone, null, null, "Location is not found"));
                     return SessionInformation;
                 }
 
                 if (stone == null)
                 {
                     WriteError("Stone is not found at given location!");
+
+                    MovementInstructions.Add(default, new MovementResult(false, null, null, targetLocation, "Stone is not found at given location!"));
                     return SessionInformation;
                 }
                 #endregion
@@ -653,8 +659,6 @@ namespace Thrones.Gaming.Chess.SessionManagement
                 var result = instraction.TryDo();
                 if (result.IsOK)
                 {
-                    MovementInstructions.Add(instraction, result);
-
                     if (result.Eated != null)
                     {
                         CurrentPlayer.Eat(result.Eated);
@@ -697,6 +701,7 @@ namespace Thrones.Gaming.Chess.SessionManagement
                     WriteError(result.Message);
                 }
 
+                MovementInstructions.Add(instraction, result);
                 return SessionInformation;
             }
 
@@ -715,14 +720,9 @@ namespace Thrones.Gaming.Chess.SessionManagement
             }).ToList(),
             Table = new TableInformation()
             {
-                Stones = Table.Stones.Select(s => new StoneInformation()
-                {
-                    Color = s.Color.ToString(),
-                    Location = $"{s.Location.X}|{s.Location.Y}",
-                    Type = s.GetType().Name
-                })
-                        .ToList()
-            }
+                Stones = Table.Stones.Select(s => new StoneInformation(s)).ToList()
+            },
+            MovementResult = new MovementResultInformation(MovementInstructions.GetLast(), Check, Checkmate)
         };
 
         public ISession SetIndexer(int currentIndexer)

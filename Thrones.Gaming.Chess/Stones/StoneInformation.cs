@@ -5,6 +5,19 @@
         public string Type { get; set; }
         public string Color { get; set; }
         public string Location { get; set; }
+        public int MoveCount { get; set; }
+
+        public StoneInformation(IStone stone)
+        {
+            Type = stone.GetType().Name;
+            Color = stone.Color.ToString();
+            Location = $"{stone.Location.X}|{stone.Location.Y}";
+            MoveCount = stone.MoveCount;
+        }
+
+        public StoneInformation()
+        {
+        }
 
         public EnumStoneColor GetStoneColor()
         {

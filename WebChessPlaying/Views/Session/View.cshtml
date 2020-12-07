@@ -1,36 +1,100 @@
 ﻿
 @{
     string sessionName = ViewBag.SessionName;
+    string playerNickname = ViewBag.PlayerNickname;
     ViewData["Title"] = "View";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
+
+<style type="text/css">
+    #console {
+        font-size: 14px;
+        overflow-y: auto;
+        height: 640px;
+        border: 1px solid #221d1d;
+        background: #f5e4cb;
+        margin-top: 46px;
+    }
+
+    #board td img:hover{
+        cursor: pointer;
+    }
+
+    .selected-stone{
+        border:2px solid #000 !important;
+    }
+
+    .coordinate-x {
+        font-size: 13px;
+        vertical-align:top;
+        height:30px !important;
+    }
+
+    .coordinate-y {
+        border-color: #fff !important;
+        vertical-align: middle !important;
+        font-size: 13px;
+    }
+
+    .board-cell {
+        width: 103px;
+        height: 80px;
+        text-align: center
+    }
+
+    .player-nickname{
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+</style>
 
 <h1>Chess Session</h1>
 <hr />
 @{ 
     <div class="row">
         <div class="col-md-9">
+
+            <div class="player-nickname" id="player0"></div>
             <table class="table table-bordered" id="board">
+
                 @for (int y = 8; y > 0; y--)
                 {
                     var bg = "#d18b47";
 
 
                     <tr>
+                        <td class="coordinate-y">
+                            @y
+                        </td>
                         @for (int x = 1; x <= 8; x++)
                         {
-
                             bg = (y + x) % 2 == 0 ? "#d18b47" : "#ffce9e";
-                            <td style="background:@bg;width:80px;height:80px;" data-x="@x" data-y="@y">
-
-                            </td>
+                            <td class="board-cell" style="background:@bg;" data-x="@x" data-y="@y"></td>
                         }
                     </tr>
 
                 }
             </table>
+            <table>
+                <tr>
+                    <td class="coordinate-y">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                    <td class="board-cell coordinate-x">a</td>
+                    <td class="board-cell coordinate-x">b</td>
+                    <td class="board-cell coordinate-x">c</td>
+                    <td class="board-cell coordinate-x">d</td>
+                    <td class="board-cell coordinate-x">e</td>
+                    <td class="board-cell coordinate-x">f</td>
+                    <td class="board-cell coordinate-x">g</td>
+                    <td class="board-cell coordinate-x">h</td>
+                </tr>
+            </table>
+            <div class="player-nickname" id="player1"></div>
         </div>
-        <div class="col-md-3"></div>
+        <div id="console" class="col-md-3">
+            
+        </div>
     </div>
     
 }
@@ -39,6 +103,82 @@
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script type="text/javascript">
+
+    let player = '@playerNickname';
+    let currentIndexer = 0;
+    let session = {};
+    let xCoordinates = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+    let selectedStone = {
+        type: '',
+        color: '',
+        location: {
+            x: 0,
+            y: 0
+        },
+        assignFrom: function (stoneInfo) {
+            this.type = stoneInfo.type;
+            this.color = stoneInfo.color;
+            this.location.x = stoneInfo.location.split('|')[0];
+            this.location.y = stoneInfo.location.split('|')[1];
+        },
+        move: function (x, y) {
+
+            let from = xCoordinates[this.location.x - 1] + '' + this.location.y;
+            let to = xCoordinates[x - 1] + '' + y;
+            let command = from + " " + to;
+
+            console.log(command);
+
+            $.ajax({
+                url: 'http://localhost:5000/api/chess',
+                contentType: 'application/json;charset=utf-8',
+                dataType: 'json',
+                method: 'POST',
+                headers: { SessionName: '@sessionName' },
+                processData: false,
+                data: '{"command":"' + command + '"}',
+                success: function (response) {
+                    session = response;
+
+                    // remove current
+                    selectedStone.removeCurrentLocation();
+                    selectedStone.release();
+
+
+                    drawTable();
+                    stoneSelectionBindings();
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    addToConsole('error occured');
+                },
+                complete: function (xhr, textStatus) {
+                }
+            });
+
+        },
+        removeCurrentLocation: function () {
+            $('#board td[data-x="' + this.location.x + '"][data-y="' + this.location.y + '"] img').remove();
+        },
+        release: function () {
+            this.type = '';
+            this.color = '';
+            this.location.x = 0;
+            this.location.y = 0;
+        }
+    };
+
+    function setTurn() {
+
+        let index = session.currentIndexer;
+        index += 1;
+        index = index % 2;
+        session.currentIndexer = index;
+
+        var currentPlayer = getCurrentPlayer();
+        addToConsole('Sıra <strong>' + currentPlayer + '</strong> oyuncusunda!');
+    }
+    
 
     $(document).ready(function () {
 
@@ -51,22 +191,130 @@
             success: function (data) {
                 console.log(data);
 
-                for (var i = 0; i < data.table.stones.length; i++) {
-                    var stoneInfo = data.table.stones[i];
+                session = data;
 
-                    var icon = '/lib/icons/' + stoneInfo.type.toLowerCase() + '-' + stoneInfo.color.toLowerCase() + '.png';
-                    var locationX = stoneInfo.location.split('|')[0];
-                    var locationY = stoneInfo.location.split('|')[1];
-
-                    $('#board td[data-x="' + locationX + '"][data-y="' + locationY + '"]').html("<img src='" + icon + "' />");
-                }
+                sessionCreate();
+                drawTable();                
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                console.log(textStatus);
+            error: function (xhr, textStatus, errorThrown) {
                 console.log(errorThrown);
+            },
+            complete: function (xhr, textStatus) {
+                if (textStatus === "success") {
+
+                    // stone selection
+                    stoneSelectionBindings();
+
+                    // stone mmove to target location
+                    stoneMovementBindings();
+
+                }
             }
-        })
+        });
 
     });
+
+    function sessionCreate() {
+
+        $('#player0').text(session.players[0].nickname);
+        $('#player1').text(session.players[1].nickname);
+                
+    }
+
+    function getCurrentPlayer() {
+        return session.players[session.currentIndexer].nickname;
+    }
+
+    function drawTable() {
+        for (var i = 0; i < session.table.stones.length; i++) {
+            let stoneInfo = session.table.stones[i];
+
+            let stoneName = stoneInfo.type.toLowerCase() + '-' + stoneInfo.color.toLowerCase();
+            let icon = '/lib/icons/' + stoneName + '.png';
+            let locationX = stoneInfo.location.split('|')[0];
+            let locationY = stoneInfo.location.split('|')[1];
+
+            $('#board td[data-x="' + locationX + '"][data-y="' + locationY + '"]')
+                .html("<img src='" + icon + "' data-type='" + stoneInfo.type + "' data-color='" + stoneInfo.color + "' data-location='" + stoneInfo.location + "' data-stone='" + stoneName + "' />");
+        }
+
+        if (session.movementResult) {
+            addToConsole(session.movementResult.message);
+
+            if (session.movementResult.check == true) {
+
+                addToConsole('<label style="color:red">Şah !</label>');
+            }
+
+            if (session.movementResult.checkmate == true) {
+                addToConsole('<label style="color:red">Şah mat!</label>');
+            }
+        }
+
+        var currentPlayer = getCurrentPlayer();
+        addToConsole('Sıra <strong>' + currentPlayer + '</strong> oyuncusunda!');
+    }
+
+    function stoneSelectionBindings() {
+
+        $('#board td img').each(function () {
+            $(this).unbind('click');
+        });
+
+        $('#board td img').on('click', function () {
+
+            let x = $(this).parent().data('x');
+            let y = $(this).parent().data('y');
+            let type = $(this).data('type');
+            let color = $(this).data('color');
+            let colorIndex = color === 'Black' ? 0 : 1;
+            let isMyStone = player.toLowerCase() == session.players[colorIndex].nickname.toLowerCase();
+
+            // şuanda selectedStone null ise
+            // yeni bir selection yapıyorumdur
+            // ve bu kesinlikle benim taşlarımdan olmalı
+            //debugger;
+
+            if (isMyStone) {
+                // clear all selections
+                $('.selected-stone').removeClass('selected-stone');
+
+                // add selection to current stone
+                $(this).parent().addClass('selected-stone');
+
+                // assign selectedStone
+                selectedStone.type = type;
+                selectedStone.color = color;
+                selectedStone.location.x = x;
+                selectedStone.location.y = y;
+            } else {
+
+                if (selectedStone.type !== '') {
+                    selectedStone.move(x, y);
+                }
+
+            }
+
+        });
+    }
+
+    function stoneMovementBindings() {
+        $('#board td').on('click', function () {
+            let x = $(this).data('x');
+            let y = $(this).data('y');
+
+            if (selectedStone.type !== '' && !(selectedStone.location.x == x && selectedStone.location.y == y)) {
+                selectedStone.move(x, y);
+            }
+        });
+    }
+
+    function addToConsole(message) {
+        let now = new Date();
+        let time = now.toTimeString().split(' ')[0];
+
+        $('#console').append('<p>[' + time + ']: ' + message + '</p>');
+        $('#console').append('<hr />');
+    }
 
 </script>

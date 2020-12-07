@@ -27,7 +27,10 @@ namespace ChessPlaying
             //    .AddStartingCommands(startingCommands.ToArray())
             //    .Start();
 
-            string text = "{\"CurrentIndexer\": \"0\", \"FullTypeName\": \"ChessPlaying.ChessPlayingSession\", \"Name\":\"test-session\",\"Players\":[{\"Nickname\":\"faruk\"},{\"Nickname\":\"ali\"}],\"Table\":{\"Stones\":[{\"Type\":\"King\",\"Color\":\"Black\",\"Location\":\"4|8\"},{\"Type\":\"Queen\",\"Color\":\"Black\",\"Location\":\"3|8\"},{\"Type\":\"King\",\"Color\":\"White\",\"Location\":\"4|1\"},{\"Type\":\"Queen\",\"Color\":\"White\",\"Location\":\"3|1\"}]}}";
+            string path = @"C:\Users\faruk\source\repos\ChessGame\ChessPlaying\session.json";
+            string text = System.IO.File.ReadAllText(path);
+
+            //string text = "{\"CurrentIndexer\": \"0\", \"FullTypeName\": \"ChessPlaying.ChessPlayingSession\", \"Name\":\"test-session\",\"Players\":[{\"Nickname\":\"faruk\"},{\"Nickname\":\"ali\"}],\"Table\":{\"Stones\":[{\"Type\":\"King\",\"Color\":\"Black\",\"Location\":\"4|8\"},{\"Type\":\"Queen\",\"Color\":\"Black\",\"Location\":\"3|8\"},{\"Type\":\"King\",\"Color\":\"White\",\"Location\":\"4|1\"},{\"Type\":\"Queen\",\"Color\":\"White\",\"Location\":\"3|1\"}]}}";
 
             var session = SessionFactory.CreateFrom(text);
 

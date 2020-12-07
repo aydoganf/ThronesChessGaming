@@ -19,7 +19,13 @@ namespace Thrones.Gaming.Chess.SessionManagement
 
         public static TValue GetLast<TKey, TValue>(this Dictionary<TKey, TValue> keyValuePairs)
         {
-            TKey lastKey = keyValuePairs.Keys.Last();
+            TKey lastKey = keyValuePairs.Keys.LastOrDefault();
+
+            if (lastKey is null)
+            {
+                return (TValue)default;
+            }
+
             return keyValuePairs[lastKey];
         }
     }

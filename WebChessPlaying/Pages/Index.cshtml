@@ -8,7 +8,9 @@
     <h1 class="display-4">Welcome</h1>
     <p>Please give the session name below:</p>
     <p>
-        <input type="text" class="form-control-lg" id="session-name" /> <button id="enter-session" class="btn btn-lg btn-primary">Enter</button>
+        <input type="text" class="form-control-lg" placeholder="nickname" id="nickname-to-enter" /> 
+        <input type="text" class="form-control-lg" id="session-name" placeholder="session name" /> 
+        <button id="enter-session" class="btn btn-lg btn-primary">Enter</button>
     </p>
     <p>OR create a new session</p>
     <p>
@@ -19,11 +21,46 @@
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script type="text/javascript">
 
+    let people = ["Lindsey", "Riva", "Tyron", "Kathrin", "Roselee", "Bernard", "Kena", "Ned", "Marinda", "Layla"];
+
     $(document).ready(function () {
 
         $('#enter-session').click(function () {
 
-            window.location.href = "https://localhost:44327/session/view/" + $('#session-name').val();
+            let nickname = $('#nickname-to-enter').val();
+
+            window.location.href = "https://localhost:44327/session/view/" + $('#session-name').val() + "?nickname=" + nickname;
+
+        });
+
+        $('#create-session').click(function () {
+
+            let nickname = $('#nickname').val();
+
+            if (nickname === '') {
+                alert('Please enter your nickname!');
+            } else {
+                let rnd = Math.floor(Math.random() * 10);
+                var enemy = people[rnd];
+
+                $.ajax({
+                    url: 'http://localhost:5000/api/chess/create',
+                    contentType: 'application/json;charset=utf-8',
+                    dataType: 'json',
+                    method: 'POST',
+                    data: '{ "players": [{ "nickname": "' + nickname + '" }, { "nickname": "' + enemy + '" }] }',
+                    success: function (data) {
+                        window.location.href = "https://localhost:44327/session/view/" + data.name;
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log(errorThrown);
+                    },
+                    complete: function (xhr, textStatus) {
+                        if (textStatus === "success") {
+                        }
+                    }
+                });
+            }
 
         });
 

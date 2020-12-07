@@ -34,5 +34,15 @@ namespace ChessPlaying.API.Services
         {
             return _chessDbContext.Sessions.FirstOrDefault(s => s.SessionName == name);
         }
+
+        public Session UpdateSession(Session session)
+        {
+            var dbSession = GetSession(session.SessionName);
+            dbSession.SessionInfo = session.SessionInfo;
+            _chessDbContext.Sessions.Update(dbSession);
+            _chessDbContext.SaveChanges();
+
+            return dbSession;
+        }
     }
 }

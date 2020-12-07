@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Thrones.Gaming.Chess.Coordinate;
 using Thrones.Gaming.Chess.Players;
 using Thrones.Gaming.Chess.SessionManagement;
@@ -81,8 +82,10 @@ namespace Thrones.Gaming.Chess.Movement
 
             if (isOk)
             {
+                message = $"<strong>{Session.CurrentPlayer.Nickname}</strong> oyuncusu <strong>{FromLocation.Name}</strong> -> <strong>{Target.Name}</strong> oynadı.";
+
                 MovingStone.Move(Target, Session.Table, out willEated);
-                return new MovementResult(true, MovingStone, willEated, Target, "OK", checkRemoved);
+                return new MovementResult(true, MovingStone, willEated, Target, message, checkRemoved);
             }
 
             return new MovementResult(false, MovingStone, null, Target, message);
