@@ -92,6 +92,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (left != null && TryMove(left, table, out _s))
             {
                 leftOpen = true;
+                GhostMove(left);
                 foreach (var enemyStone in enemyStones)
                 {
                     if (enemyStone.TryMove(left, table, out IStone _e))
@@ -100,6 +101,7 @@ namespace Thrones.Gaming.Chess.Stones
                         break;
                     }
                 }
+                UndoGhost();
             }
 
             // left-top
@@ -107,6 +109,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (leftTop != null && TryMove(leftTop, table, out _s))
             {
                 leftTopOpen = true;
+                GhostMove(leftTop);
                 foreach (var enemyStone in enemyStones)
                 {
                     if (enemyStone.TryMove(leftTop, table, out IStone _e))
@@ -115,6 +118,7 @@ namespace Thrones.Gaming.Chess.Stones
                         break;
                     }
                 }
+                UndoGhost();
             }
 
             // top
@@ -122,6 +126,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (top != null && TryMove(top, table, out _s))
             {
                 topOpen = true;
+                GhostMove(top);
                 foreach (var enemtStone in enemyStones)
                 {
                     if (enemtStone.TryMove(top, table, out IStone _e))
@@ -129,6 +134,7 @@ namespace Thrones.Gaming.Chess.Stones
                         topOpen = false;
                     }
                 }
+                UndoGhost();
             }
 
             // right-top
@@ -136,6 +142,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (rightTop != null && TryMove(rightTop, table, out _s))
             {
                 rightTopOpen = true;
+                GhostMove(rightTop);
                 foreach (var enemtStone in enemyStones)
                 {
                     if (enemtStone.TryMove(rightTop, table, out IStone _e))
@@ -143,6 +150,7 @@ namespace Thrones.Gaming.Chess.Stones
                         rightTopOpen = false;
                     }
                 }
+                UndoGhost();
             }
 
             // right
@@ -150,6 +158,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (right != null && TryMove(right, table, out _s))
             {
                 rightOpen = false;
+                GhostMove(right);
                 foreach (var enemtStone in enemyStones)
                 {
                     if (enemtStone.TryMove(right, table, out IStone _e))
@@ -157,6 +166,7 @@ namespace Thrones.Gaming.Chess.Stones
                         rightOpen = false;
                     }
                 }
+                UndoGhost();
             }
 
             // right-bottom
@@ -164,6 +174,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (rightBottom != null && TryMove(rightBottom, table, out _s))
             {
                 rightBottomOpen = true;
+                GhostMove(rightBottom);
                 foreach (var enemtStone in enemyStones)
                 {
                     if (enemtStone.TryMove(rightBottom, table, out IStone _e))
@@ -171,6 +182,7 @@ namespace Thrones.Gaming.Chess.Stones
                         rightBottomOpen = false;
                     }
                 }
+                UndoGhost();
             }
 
             // bottom
@@ -178,6 +190,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (bottom != null && TryMove(bottom, table, out _s))
             {
                 bottomOpen = true;
+                GhostMove(bottom);
                 foreach (var enemtStone in enemyStones)
                 {
                     if (enemtStone.TryMove(bottom, table, out IStone _e))
@@ -185,6 +198,7 @@ namespace Thrones.Gaming.Chess.Stones
                         bottomOpen = false;
                     }
                 }
+                UndoGhost();
             }
 
             // left-bottom
@@ -192,6 +206,7 @@ namespace Thrones.Gaming.Chess.Stones
             if (leftBottom != null && TryMove(leftBottom, table, out _s))
             {
                 leftBottomOpen = true;
+                GhostMove(leftBottom);
                 foreach (var enemtStone in enemyStones)
                 {
                     if (enemtStone.TryMove(leftBottom, table, out IStone _e))
@@ -199,6 +214,7 @@ namespace Thrones.Gaming.Chess.Stones
                         leftBottomOpen = false;
                     }
                 }
+                UndoGhost();
             }
 
             return leftOpen || leftTopOpen || topOpen || rightTopOpen || rightOpen || rightBottomOpen || bottomOpen || leftBottomOpen;

@@ -1,7 +1,7 @@
 {
   "Name": "66fb0ca0-350e-4095-9073-ac42ec3872ab",
   "FullTypeName": "ChessPlaying.ChessPlayingSession",
-  "CurrentIndexer": 1,
+  "CurrentIndexer": 0,
   "Players": [
     {
       "Nickname": "Faruk",
@@ -17,77 +17,47 @@
       {
         "Type": "Pawn",
         "Color": "Black",
-        "Location": "1|7"
+        "Location": "2|7"
       },
       {
         "Type": "Pawn",
         "Color": "Black",
-        "Location": "5|5"
-      },
-      {
-        "Type": "Pawn",
-        "Color": "Black",
-        "Location": "6|4"
-      },
-      {
-        "Type": "Pawn",
-        "Color": "Black",
-        "Location": "7|4"
-      },
-      {
-        "Type": "Pawn",
-        "Color": "Black",
-        "Location": "8|7"
+        "Location": "6|6"
       },
       {
         "Type": "Rook",
         "Color": "Black",
-        "Location": "3|8"
-      },
-      {
-        "Type": "Rook",
-        "Color": "Black",
-        "Location": "8|8"
-      },
-      {
-        "Type": "Knight",
-        "Color": "Black",
-        "Location": "5|4"
+        "Location": "7|5"
       },
       {
         "Type": "Queen",
         "Color": "Black",
-        "Location": "3|4"
+        "Location": "4|1"
       },
       {
         "Type": "King",
         "Color": "Black",
-        "Location": "4|8"
+        "Location": "6|7"
       },
       {
         "Type": "Pawn",
         "Color": "White",
-        "Location": "4|4"
-      },
-      {
-        "Type": "Pawn",
-        "Color": "White",
-        "Location": "6|2"
-      },
-      {
-        "Type": "Pawn",
-        "Color": "White",
-        "Location": "8|6"
+        "Location": "1|4"
       },
       {
         "Type": "Bishop",
         "Color": "White",
-        "Location": "1|3"
+        "Location": "5|3"
       },
       {
         "Type": "King",
         "Color": "White",
-        "Location": "4|1"
+        "Location": "8|3"
+      },
+      {
+        "Type": "Queen",
+        "Color": "White",
+        "Location": "6|5"
       }
     ]
   },
